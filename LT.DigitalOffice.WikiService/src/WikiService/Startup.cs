@@ -44,8 +44,8 @@ namespace LT.DigitalOffice.WikiService
         .GetSection(BaseRabbitMqConfig.SectionName)
         .Get<RabbitMqConfig>();
 
-      Version = "1.4.5.2";
-      Description = "UserService is an API that intended to work with users.";
+      Version = "1.0.0.0";
+      Description = "WikiService is an API that intended to work with informational articles.";
       StartTime = DateTime.UtcNow;
       ApiName = $"LT Digital Office - {_serviceInfoConfig.Name}";
     }
