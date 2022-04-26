@@ -28,7 +28,7 @@ namespace LT.DigitalOffice.WikiService
 
       Log.Logger = new LoggerConfiguration().ReadFrom
         .Configuration(configuration)
-        .Enrich.WithProperty("Service", "UserService")
+        .Enrich.WithProperty("Service", "WikiService")
         .WriteTo.Seq(
           serverUrl: seqServerUrl,
           apiKey: seqApiKey)

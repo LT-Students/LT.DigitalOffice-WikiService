@@ -6,7 +6,6 @@ using LT.DigitalOffice.Kernel.Configurations;
 using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.Helpers;
 using LT.DigitalOffice.Kernel.Middlewares.ApiInformation;
-using LT.DigitalOffice.Kernel.RedisSupport.Configurations;
 using MassTransit;
 using MassTransit.RabbitMqTransport;
 using Microsoft.AspNetCore.Builder;
@@ -14,16 +13,21 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
-using StackExchange.Redis;
 using System;
 using LT.DigitalOffice.WikiService.Models.Dto.Configurations;
+using LT.DigitalOffice.WikiService.Data.Provider.MsSql.Ef;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using HealthChecks.UI.Client;
 
 namespace LT.DigitalOffice.WikiService
 {
   public class Startup : BaseApiInfo
   {
     public const string CorsPolicyName = "LtDoCorsPolicy";
-    private string redisConnStr;
 
     private readonly BaseServiceInfoConfig _serviceInfoConfig;
     private readonly RabbitMqConfig _rabbitMqConfig;
@@ -36,9 +40,9 @@ namespace LT.DigitalOffice.WikiService
     {
       Configuration = configuration;
 
-      _serviceInfoConfig = Configuration
-        .GetSection(BaseServiceInfoConfig.SectionName)
-        .Get<BaseServiceInfoConfig>();
+      _serviceInfoConfig = Configuration.
+        GetSection(BaseServiceInfoConfig.SectionName).
+        Get<BaseServiceInfoConfig>();
 
       _rabbitMqConfig = Configuration
         .GetSection(BaseRabbitMqConfig.SectionName)
@@ -82,34 +86,10 @@ namespace LT.DigitalOffice.WikiService
         .AddRabbitMqCheck()
         .AddSqlServer(connStr);
 
-      /*services.AddDbContext<WikiServiceDbContext>(options =>
+      services.AddDbContext<WikiServiceDbContext>(options =>
       {
         options.UseSqlServer(connStr);
-      });*/
-
-      if (int.TryParse(Environment.GetEnvironmentVariable("MemoryCacheLiveInMinutes"), out int memoryCacheLifetime))
-      {
-        services.Configure<MemoryCacheConfig>(options =>
-        {
-          options.CacheLiveInMinutes = memoryCacheLifetime;
-        });
-      }
-      else
-      {
-        services.Configure<MemoryCacheConfig>(Configuration.GetSection(MemoryCacheConfig.SectionName));
-      }
-
-      if (int.TryParse(Environment.GetEnvironmentVariable("RedisCacheLiveInMinutes"), out int redisCacheLifeTime))
-      {
-        services.Configure<RedisConfig>(options =>
-        {
-          options.CacheLiveInMinutes = redisCacheLifeTime;
-        });
-      }
-      else
-      {
-        services.Configure<RedisConfig>(Configuration.GetSection(RedisConfig.SectionName));
-      }
+      });
 
       services.Configure<TokenConfiguration>(Configuration.GetSection("CheckTokenMiddleware"));
       services.Configure<BaseServiceInfoConfig>(Configuration.GetSection(BaseServiceInfoConfig.SectionName));
@@ -117,23 +97,9 @@ namespace LT.DigitalOffice.WikiService
 
       services.AddMemoryCache();
       services.AddBusinessObjects();
+      services.AddControllers();
 
       ConfigureMassTransit(services);
-
-      redisConnStr = Environment.GetEnvironmentVariable("RedisConnectionString");
-      if (string.IsNullOrEmpty(redisConnStr))
-      {
-        redisConnStr = Configuration.GetConnectionString("Redis");
-
-        Log.Information($"Redis connection string from appsettings.json was used. Value '{PasswordHider.Hide(redisConnStr)}'");
-      }
-      else
-      {
-        Log.Information($"Redis connection string from environment was used. Value '{PasswordHider.Hide(redisConnStr)}'");
-      }
-
-      services.AddSingleton<IConnectionMultiplexer>(
-        x => ConnectionMultiplexer.Connect(redisConnStr + ",abortConnect=false,connectRetry=1,connectTimeout=2000"));
     }
     #endregion
 
@@ -169,9 +135,9 @@ namespace LT.DigitalOffice.WikiService
         .GetRequiredService<IServiceScopeFactory>()
         .CreateScope();
 
-      //using var context = serviceScope.ServiceProvider.GetService<WikiServiceDbContext>();
+      using var context = serviceScope.ServiceProvider.GetService<WikiServiceDbContext>();
 
-      //context.Database.Migrate();
+      context.Database.Migrate();
     }
     private void ConfigureMassTransit(IServiceCollection services)
     {
@@ -202,6 +168,38 @@ namespace LT.DigitalOffice.WikiService
         RabbitMqConfig rabbitMqConfig)
     {
       //add endpoints
+    }
+    public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory)
+    {
+      UpdateDatabase(app);
+
+      app.UseForwardedHeaders();
+
+      app.UseExceptionsHandler(loggerFactory);
+
+      app.UseApiInformation();
+
+      app.UseRouting();
+
+      app.UseMiddleware<TokenMiddleware>();
+
+      app.UseCors(CorsPolicyName);
+
+      app.UseEndpoints(endpoints =>
+      {
+        endpoints.MapControllers().RequireCors(CorsPolicyName);
+        endpoints.MapHealthChecks($"/{_serviceInfoConfig.Id}/hc", new HealthCheckOptions
+        {
+          ResultStatusCodes = new Dictionary<HealthStatus, int>
+          {
+            { HealthStatus.Unhealthy, 200 },
+            { HealthStatus.Healthy, 200 },
+            { HealthStatus.Degraded, 200 },
+          },
+          Predicate = check => check.Name != "masstransit-bus",
+          ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+        });
+      });
     }
     #endregion
   }
