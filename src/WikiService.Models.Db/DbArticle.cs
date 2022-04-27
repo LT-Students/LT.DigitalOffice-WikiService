@@ -26,23 +26,24 @@ namespace LT.DigitalOffice.WikiService.Models.Db
       Files = new HashSet<DbArticleFile>();
     }
   }
+
   public class DbArticleConfiguration : IEntityTypeConfiguration<DbArticle>
   {
     public void Configure(EntityTypeBuilder<DbArticle> builder)
     {
-      builder.
-        ToTable(DbArticle.TableName);
+      builder
+        .ToTable(DbArticle.TableName);
 
-      builder.
-        HasKey(a => a.Id);
+      builder
+        .HasKey(a => a.Id);
 
-      builder.
-        HasOne(r => r.Rubric).
-        WithMany(a => a.Articles);
+      builder
+        .HasOne(r => r.Rubric)
+        .WithMany(a => a.Articles);
 
-      builder.
-       HasMany(af => af.Files).
-       WithOne(a => a.Article);
+      builder
+       .HasMany(af => af.Files)
+       .WithOne(a => a.Article);
     }
   }
 }

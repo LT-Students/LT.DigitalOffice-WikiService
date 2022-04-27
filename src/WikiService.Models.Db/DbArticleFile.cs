@@ -14,19 +14,20 @@ namespace LT.DigitalOffice.WikiService.Models.Db
 
     public DbArticle Article { get; set; }
   }
+
   public class DbArticleFileConfiguration : IEntityTypeConfiguration<DbArticleFile>
   {
     public void Configure(EntityTypeBuilder<DbArticleFile> builder)
     {
-      builder.
-        ToTable(DbArticleFile.TableName);
+      builder
+        .ToTable(DbArticleFile.TableName);
 
-      builder.
-        HasKey(af => af.Id);
+      builder
+        .HasKey(af => af.Id);
 
-      builder.
-        HasOne(a => a.Article).
-        WithMany(af => af.Files);
+      builder
+        .HasOne(a => a.Article)
+        .WithMany(af => af.Files);
     }
   }
 }

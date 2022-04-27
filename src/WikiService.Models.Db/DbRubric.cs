@@ -25,19 +25,20 @@ namespace LT.DigitalOffice.WikiService.Models.Db
       Articles = new HashSet<DbArticle>();
     }
   }
+
   public class DbRubricConfiguration : IEntityTypeConfiguration<DbRubric>
   {
     public void Configure(EntityTypeBuilder<DbRubric> builder)
     {
-      builder.
-        ToTable(DbRubric.TableName);
+      builder
+        .ToTable(DbRubric.TableName);
 
-      builder.
-        HasKey(r => r.Id);
+      builder
+        .HasKey(r => r.Id);
 
-      builder.
-        HasMany(a => a.Articles).
-        WithOne(r => r.Rubric);
+      builder
+        .HasMany(a => a.Articles)
+        .WithOne(r => r.Rubric);
     }
   }
 }
