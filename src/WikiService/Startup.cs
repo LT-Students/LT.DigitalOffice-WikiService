@@ -153,8 +153,6 @@ namespace LT.DigitalOffice.WikiService
             host.Username(username);
             host.Password(password);
           });
-
-          ConfigureEndpoints(context, cfg, _rabbitMqConfig);
         });
 
         busConfigurator.AddRequestClients(_rabbitMqConfig);
@@ -162,13 +160,6 @@ namespace LT.DigitalOffice.WikiService
       services.AddMassTransitHostedService();
     }
 
-    private void ConfigureEndpoints(
-        IBusRegistrationContext context,
-        IRabbitMqBusFactoryConfigurator cfg,
-        RabbitMqConfig rabbitMqConfig)
-    {
-      //add endpoints
-    }
     public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory)
     {
       UpdateDatabase(app);

@@ -30,6 +30,7 @@ namespace LT.DigitalOffice.WikiService.Data.Provider.MsSql.Ef.Migrations
           table.PrimaryKey("PK_Rubrics", x => x.Id);
         });
     }
+
     private void CreateTableArticles(MigrationBuilder migrationBuilder)
     {
       migrationBuilder.CreateTable(
@@ -40,6 +41,7 @@ namespace LT.DigitalOffice.WikiService.Data.Provider.MsSql.Ef.Migrations
           Name = table.Column<string>(nullable: false),
           Content = table.Column<string>(nullable: false),
           IsActive = table.Column<bool>(nullable: false),
+          RubricId = table.Column<Guid>(nullable: false),
           CreatedBy = table.Column<Guid>(nullable: false),
           CreatedAtUtc = table.Column<DateTime>(nullable: false),
           ModifiedBy = table.Column<Guid>(nullable: true),
@@ -50,6 +52,7 @@ namespace LT.DigitalOffice.WikiService.Data.Provider.MsSql.Ef.Migrations
           table.PrimaryKey("PK_Articles", x => x.Id);
         });
     }
+
     private void CreateTableArticlesFiles(MigrationBuilder migrationBuilder)
     {
       migrationBuilder.CreateTable(
@@ -65,6 +68,7 @@ namespace LT.DigitalOffice.WikiService.Data.Provider.MsSql.Ef.Migrations
           table.PrimaryKey("PK_ArticlesFiles", x => x.Id);
         });
     }
+
     protected override void Up(MigrationBuilder migrationBuilder)
     {
       CreateTableRubrics(migrationBuilder);
@@ -73,6 +77,7 @@ namespace LT.DigitalOffice.WikiService.Data.Provider.MsSql.Ef.Migrations
 
       CreateTableArticlesFiles(migrationBuilder);
     }
+
     protected override void Down(MigrationBuilder migrationBuilder)
     {
       migrationBuilder.DropTable(DbRubric.TableName);

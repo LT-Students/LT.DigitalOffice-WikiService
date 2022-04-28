@@ -4,7 +4,6 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\WikiService.Data.Provider\WikiService.Data.Provider.csproj" />
-		<ProjectReference Include="..\WikiService.Models.Dto\WikiService.Models.Dto.csproj" />
 	</ItemGroup>
 
 </Project>
