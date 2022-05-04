@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<Import Project="$(ProjectDir)..\..\Common.Configurations.targets" />
+
+	<ItemGroup>
+		<ProjectReference Include="..\WikiService.Data\WikiService.Data.csproj" />
+		<ProjectReference Include="..\WikiService.Models.Dto\WikiService.Models.Dto.csproj" />
+	</ItemGroup>
+
+</Project>

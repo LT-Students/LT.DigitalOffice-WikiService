@@ -1,0 +1,11 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<Import Project="$(ProjectDir)..\..\Common.Configurations.targets" />
+
+	<ItemGroup>
+		<ProjectReference Include="..\WikiService.Data.Provider.MsSql.Ef\WikiService.Data.Provider.MsSql.Ef.csproj" />
+		<ProjectReference Include="..\WikiService.Models.Db\WikiService.Models.Db.csproj" />
+		<ProjectReference Include="..\WikiService.Models.Dto\WikiService.Models.Dto.csproj" />
+	</ItemGroup>
+
+</Project>

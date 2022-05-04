@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<Import Project="$(ProjectDir)..\..\Common.Configurations.targets" />
+
+	<ItemGroup>
+		<ProjectReference Include="..\WikiService.Broker\WikiService.Broker.csproj" />
+		<ProjectReference Include="..\WikiService.Data\WikiService.Data.csproj" />
+		<ProjectReference Include="..\WikiService.Mappers\WikiService.Mappers.csproj" />
+		<ProjectReference Include="..\WikiService.Validation\WikiService.Validation.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Folder Include="Commands\" />
+	</ItemGroup>
+
+</Project>
