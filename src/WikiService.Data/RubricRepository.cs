@@ -1,5 +1,13 @@
-﻿using LT.DigitalOffice.WikiService.Data.Interfaces;
+﻿using System.Linq;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
+using LT.DigitalOffice.WikiService.Data.Interfaces;
 using LT.DigitalOffice.WikiService.Data.Provider;
+using LT.DigitalOffice.WikiService.Models.Db;
+using LT.DigitalOffice.WikiService.Models.Dto.Requests.Filters;
+
+
 
 namespace LT.DigitalOffice.WikiService.Data
 {
@@ -7,10 +15,52 @@ namespace LT.DigitalOffice.WikiService.Data
   {
     private readonly IDataProvider _provider;
 
+    private IQueryable<DbRubric> CreateFindPredicates(
+      FindRubricFilter filter,
+      IQueryable<DbRubric> dbRubric)
+    {
+      dbRubric = dbRubric.Where(rubric => rubric.ParentId == null);
+
+      if (!string.IsNullOrEmpty(filter.NameIncludeSubstring))
+      {
+        dbRubric = dbRubric.Where(
+          rubric =>
+            rubric.Name.Contains(filter.NameIncludeSubstring));
+      }
+
+      if (filter.IsAscendingSort.HasValue)
+      {
+        dbRubric = filter.IsAscendingSort.Value
+          ? dbRubric.OrderBy(rubric => rubric.Name)
+          : dbRubric.OrderByDescending(rubric => rubric.Name);
+      }
+      else
+      {
+        dbRubric = dbRubric.OrderByDescending(rubric => rubric.CreatedAtUtc);
+      }
+
+      return dbRubric;
+    }
     public RubricRepository(
       IDataProvider provider)
     {
       _provider = provider;
+    }
+
+    public async Task<(List<DbRubric> dbRubric, int totalCount)> FindAsync(FindRubricFilter filter)
+    {
+      if (filter is null)
+      {
+        return (null, default);
+      }
+
+      IQueryable<DbRubric> dbRubric = CreateFindPredicates(
+        filter,
+        _provider.Rubrics.AsQueryable());
+
+      return (
+        await dbRubric.Skip(filter.SkipCount).Take(filter.TakeCount).ToListAsync(),
+        await dbRubric.CountAsync());
     }
   }
 }

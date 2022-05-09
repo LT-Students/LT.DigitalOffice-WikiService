@@ -1,7 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace LT.DigitalOffice.WikiService.Models.Db
 {
@@ -12,6 +12,7 @@ namespace LT.DigitalOffice.WikiService.Models.Db
     public Guid Id { get; set; }
     public string Name { get; set; }
     public Guid? ParentId { get; set; }
+    public int? ChildCount { get; set; }
     public bool IsActive { get; set; }
     public Guid CreatedBy { get; set; }
     public DateTime CreatedAtUtc { get; set; }
