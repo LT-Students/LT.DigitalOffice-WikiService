@@ -1,24 +1,20 @@
 ﻿using FluentValidation.Results;
-using LT.DigitalOffice.Kernel.Enums;
 using LT.DigitalOffice.Kernel.Helpers.Interfaces;
 using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.WikiService.Business.Commands.Interfaces;
 using LT.DigitalOffice.WikiService.Data.Interfaces;
 using LT.DigitalOffice.WikiService.Mappers.Db.Interfaces;
-using LT.DigitalOffice.WikiService.Models.Db;
 using LT.DigitalOffice.WikiService.Models.Dto.Requests;
 using LT.DigitalOffice.WikiService.Validation.Rubric.Interfaces;
 using Microsoft.AspNetCore.Http;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric
 {
-    public class CreateRubricCommand : ICreateRubricCommand
+  public class CreateRubricCommand : ICreateRubricCommand
     {
     private readonly IRubricRepository _repository;
     private readonly IDbRubricMapper _mapper;
