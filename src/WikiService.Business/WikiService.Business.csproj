@@ -9,8 +9,4 @@
 		<ProjectReference Include="..\WikiService.Validation\WikiService.Validation.csproj" />
 	</ItemGroup>
 
-	<ItemGroup>
-		<Folder Include="Commands\" />
-	</ItemGroup>
-
 </Project>
