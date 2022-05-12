@@ -6,7 +6,7 @@ namespace LT.DigitalOffice.WikiService.Mappers.Db
 {
   public class RubricMapper : IRubricMapper
   {
-    public Rubric Map(DbRubric dbRubric, bool hasChild)
+    public Rubric Map(DbRubric dbRubric)
     {
       if (dbRubric is null)
       {
@@ -19,7 +19,7 @@ namespace LT.DigitalOffice.WikiService.Mappers.Db
         Name = dbRubric.Name,
         ParentId = dbRubric.ParentId,
         IsActive = dbRubric.IsActive,
-        HasChild = hasChild
+        HasChild = dbRubric.HasChild
       };
     }
   }

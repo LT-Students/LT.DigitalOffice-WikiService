@@ -7,6 +7,6 @@ namespace LT.DigitalOffice.WikiService.Mappers.Db.Interfaces
   [AutoInject]
   public interface IRubricMapper
   {
-    Rubric Map(DbRubric dbRubric, bool hasChild);
+    Rubric Map(DbRubric dbRubric);
   }
 }

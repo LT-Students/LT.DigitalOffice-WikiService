@@ -45,7 +45,7 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric
 
       (List<DbRubric> dbRubrics, int totalCount) = await _rubricRepository.FindAsync(filter);
 
-      //response.Body = dbRubrics?.Select(dbRubric => _rubricMapper.Map(dbRubric)).ToList();
+      response.Body = dbRubrics?.Select(dbRubric => _rubricMapper.Map(dbRubric)).ToList();
       response.TotalCount = totalCount;
 
       return response;
