@@ -16,9 +16,7 @@ namespace LT.DigitalOffice.WikiService.Data
     private IQueryable<DbRubric> CreateFindPredicates(
       FindRubricFilter filter,
       IQueryable<DbRubric> dbRubric)
-    {
-      dbRubric = dbRubric.Where(rubric => rubric.ParentId == null);
-     
+    {     
       if (!string.IsNullOrEmpty(filter.NameIncludeSubstring))
       {
         dbRubric = dbRubric.Where(
@@ -74,7 +72,7 @@ namespace LT.DigitalOffice.WikiService.Data
 
       IQueryable<DbRubric> dbRubric = CreateFindPredicates(
         filter,
-        _provider.Rubrics.AsQueryable());
+        _provider.Rubrics.AsQueryable().Where(rubric => rubric.ParentId == null));
     
       return (
         await dbRubric.Skip(filter.SkipCount).Take(filter.TakeCount).ToListAsync(),
