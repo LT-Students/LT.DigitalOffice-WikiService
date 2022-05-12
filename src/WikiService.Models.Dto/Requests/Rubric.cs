@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace LT.DigitalOffice.WikiService.Models.Dto.Requests
 {
-  public record FindRubricRequest
+  public record Rubric
   {
     public Guid Id { get; set; }
     public string Name { get; set; }
     public Guid? ParentId { get; set; }
-    public int? ChildCount { get; set; }
     public bool IsActive { get; set; }
+    public bool HasChild { get; set; }
   }
 }

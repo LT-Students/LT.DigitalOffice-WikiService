@@ -19,33 +19,33 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric
   {
     private readonly IBaseFindFilterValidator _baseFindValidator;
     private readonly IRubricRepository _rubricRepository;
-    private readonly IFindRubricMapper _findRubricMapper;
+    private readonly IRubricMapper _rubricMapper;
     private readonly IResponseCreator _responseCreator;
 
     public FindRubricCommand(
       IBaseFindFilterValidator baseFindValidator,
       IRubricRepository rubricRepository,
-      IFindRubricMapper findRubricMapper,
+      IRubricMapper rubricMapper,
       IResponseCreator responseCreator)
     {
       _baseFindValidator = baseFindValidator;
       _rubricRepository = rubricRepository;
-      _findRubricMapper = findRubricMapper;
+      _rubricMapper = rubricMapper;
       _responseCreator = responseCreator;
     }
 
-    public async Task<FindResultResponse<FindRubricRequest>> ExecuteAsync(FindRubricFilter filter)
+    public async Task<FindResultResponse<Models.Dto.Requests.Rubric>> ExecuteAsync(FindRubricFilter filter)
     {
       if (!_baseFindValidator.ValidateCustom(filter, out List<string> errors))
       {
-        return _responseCreator.CreateFailureFindResponse<FindRubricRequest>(HttpStatusCode.BadRequest, errors);
+        return _responseCreator.CreateFailureFindResponse<Models.Dto.Requests.Rubric>(HttpStatusCode.BadRequest, errors);
       }
 
-      FindResultResponse<FindRubricRequest> response = new();
+      FindResultResponse<Models.Dto.Requests.Rubric> response = new();
 
       (List<DbRubric> dbRubrics, int totalCount) = await _rubricRepository.FindAsync(filter);
 
-      response.Body = dbRubrics?.Select(dbRubric => _findRubricMapper.Map(dbRubric)).ToList();
+      //response.Body = dbRubrics?.Select(dbRubric => _rubricMapper.Map(dbRubric)).ToList();
       response.TotalCount = totalCount;
 
       return response;

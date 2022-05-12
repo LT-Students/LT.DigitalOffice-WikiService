@@ -12,7 +12,7 @@ namespace LT.DigitalOffice.WikiService.Controllers
   public class RubricController : ControllerBase
   {
     [HttpGet("find")]
-    public async Task<FindResultResponse<FindRubricRequest>> FindAsync(
+    public async Task<FindResultResponse<Rubric>> FindAsync(
       [FromServices] IFindRubricCommand command,
       [FromQuery] FindRubricFilter filter)
     {

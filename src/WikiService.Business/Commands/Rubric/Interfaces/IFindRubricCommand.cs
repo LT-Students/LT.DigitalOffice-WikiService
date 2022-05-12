@@ -9,6 +9,6 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric.Interfaces
   [AutoInject]
   public interface IFindRubricCommand
   {
-    Task<FindResultResponse<FindRubricRequest>> ExecuteAsync(FindRubricFilter filter);
+    Task<FindResultResponse<Models.Dto.Requests.Rubric>> ExecuteAsync(FindRubricFilter filter);
   }
 }

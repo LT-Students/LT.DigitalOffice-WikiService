@@ -10,5 +10,8 @@ namespace LT.DigitalOffice.WikiService.Models.Dto.Requests.Filters
 
     [FromQuery(Name = "isAscendingSort")]
     public bool? IsAscendingSort { get; set; }
+
+    [FromQuery(Name = "isActive")]
+    public bool? IsActive { get; set; }
   }
 }

@@ -7,8 +7,6 @@ using LT.DigitalOffice.WikiService.Data.Provider;
 using LT.DigitalOffice.WikiService.Models.Db;
 using LT.DigitalOffice.WikiService.Models.Dto.Requests.Filters;
 
-
-
 namespace LT.DigitalOffice.WikiService.Data
 {
   public class RubricRepository : IRubricRepository
@@ -20,12 +18,12 @@ namespace LT.DigitalOffice.WikiService.Data
       IQueryable<DbRubric> dbRubric)
     {
       dbRubric = dbRubric.Where(rubric => rubric.ParentId == null);
-
+     
       if (!string.IsNullOrEmpty(filter.NameIncludeSubstring))
       {
         dbRubric = dbRubric.Where(
           rubric =>
-            rubric.Name.Contains(filter.NameIncludeSubstring));
+            rubric.Name.Contains(filter.NameIncludeSubstring.ToLower()));
       }
 
       if (filter.IsAscendingSort.HasValue)
@@ -34,9 +32,29 @@ namespace LT.DigitalOffice.WikiService.Data
           ? dbRubric.OrderBy(rubric => rubric.Name)
           : dbRubric.OrderByDescending(rubric => rubric.Name);
       }
+
+      if (filter.IsActive.HasValue)
+      {
+        dbRubric = filter.IsActive.Value
+          ? dbRubric.Where(rubric => rubric.IsActive == true)
+          : dbRubric.Where(rubric => rubric.IsActive == false);
+      }
+
       else
       {
         dbRubric = dbRubric.OrderByDescending(rubric => rubric.CreatedAtUtc);
+      }
+
+      foreach(var rubric in dbRubric)
+      {
+        foreach (var id in _provider.Rubrics.AsQueryable())
+        {
+          if (id.ParentId == rubric.Id)
+          {
+            rubric.HasChild = true;
+            break;
+          }
+        }         
       }
 
       return dbRubric;
@@ -57,7 +75,7 @@ namespace LT.DigitalOffice.WikiService.Data
       IQueryable<DbRubric> dbRubric = CreateFindPredicates(
         filter,
         _provider.Rubrics.AsQueryable());
-
+    
       return (
         await dbRubric.Skip(filter.SkipCount).Take(filter.TakeCount).ToListAsync(),
         await dbRubric.CountAsync());

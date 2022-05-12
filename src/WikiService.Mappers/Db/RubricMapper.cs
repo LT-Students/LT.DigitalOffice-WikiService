@@ -4,22 +4,22 @@ using LT.DigitalOffice.WikiService.Models.Dto.Requests;
 
 namespace LT.DigitalOffice.WikiService.Mappers.Db
 {
-  public class FindRubricMapper : IFindRubricMapper
+  public class RubricMapper : IRubricMapper
   {
-    public FindRubricRequest Map(DbRubric dbRubric)
+    public Rubric Map(DbRubric dbRubric, bool hasChild)
     {
       if (dbRubric is null)
       {
         return null;
       }
 
-      return new FindRubricRequest
+      return new Rubric
       {
         Id = dbRubric.Id,
         Name = dbRubric.Name,
         ParentId = dbRubric.ParentId,
-        ChildCount = dbRubric.ChildCount,
-        IsActive = dbRubric.IsActive
+        IsActive = dbRubric.IsActive,
+        HasChild = hasChild
       };
     }
   }

@@ -5,8 +5,8 @@ using LT.DigitalOffice.WikiService.Models.Dto.Requests;
 namespace LT.DigitalOffice.WikiService.Mappers.Db.Interfaces
 {
   [AutoInject]
-  public interface IFindRubricMapper
+  public interface IRubricMapper
   {
-    FindRubricRequest Map(DbRubric dbRubric);
+    Rubric Map(DbRubric dbRubric, bool hasChild);
   }
 }

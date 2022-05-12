@@ -12,8 +12,8 @@ namespace LT.DigitalOffice.WikiService.Models.Db
     public Guid Id { get; set; }
     public string Name { get; set; }
     public Guid? ParentId { get; set; }
-    public int? ChildCount { get; set; }
     public bool IsActive { get; set; }
+    public bool HasChild { get; set; } = false;
     public Guid CreatedBy { get; set; }
     public DateTime CreatedAtUtc { get; set; }
     public Guid? ModifiedBy { get; set; }
