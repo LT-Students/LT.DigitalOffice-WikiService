@@ -1,19 +1,19 @@
-﻿using LT.DigitalOffice.WikiService.Mappers.Db.Interfaces;
+﻿using LT.DigitalOffice.WikiService.Mappers.Models.Interfaces;
 using LT.DigitalOffice.WikiService.Models.Db;
-using LT.DigitalOffice.WikiService.Models.Dto.Requests;
+using LT.DigitalOffice.WikiService.Models.Dto.Models;
 
-namespace LT.DigitalOffice.WikiService.Mappers.Db
+namespace LT.DigitalOffice.WikiService.Mappers.Models
 {
-  public class RubricMapper : IRubricMapper
+  public class RubricInfoMapper : IRubricInfoMapper
   {
-    public Rubric Map(DbRubric dbRubric)
+    public RubricInfo Map(DbRubric dbRubric)
     {
       if (dbRubric is null)
       {
         return null;
       }
 
-      return new Rubric
+      return new RubricInfo
       {
         Id = dbRubric.Id,
         Name = dbRubric.Name,

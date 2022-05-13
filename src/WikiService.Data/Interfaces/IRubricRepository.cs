@@ -1,6 +1,6 @@
 ﻿using LT.DigitalOffice.Kernel.Attributes;
 using LT.DigitalOffice.WikiService.Models.Db;
-using LT.DigitalOffice.WikiService.Models.Dto.Requests.Filters;
+using LT.DigitalOffice.WikiService.Models.Dto.Requests.Rubric.Filters;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 

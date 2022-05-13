@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using LT.DigitalOffice.WikiService.Data.Interfaces;
 using LT.DigitalOffice.WikiService.Data.Provider;
 using LT.DigitalOffice.WikiService.Models.Db;
-using LT.DigitalOffice.WikiService.Models.Dto.Requests.Filters;
+using LT.DigitalOffice.WikiService.Models.Dto.Requests.Rubric.Filters;
 
 namespace LT.DigitalOffice.WikiService.Data
 {

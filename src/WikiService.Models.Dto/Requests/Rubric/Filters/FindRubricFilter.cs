@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using LT.DigitalOffice.Kernel.Requests;
 
-namespace LT.DigitalOffice.WikiService.Models.Dto.Requests.Filters
+namespace LT.DigitalOffice.WikiService.Models.Dto.Requests.Rubric.Filters
 {
   public record FindRubricFilter : BaseFindFilter
   {
