@@ -8,7 +8,6 @@ using LT.DigitalOffice.Kernel.Helpers.Interfaces;
 using LT.DigitalOffice.Kernel.FluentValidationExtensions;
 using LT.DigitalOffice.WikiService.Business.Commands.Rubric.Interfaces;
 using LT.DigitalOffice.WikiService.Data.Interfaces;
-using LT.DigitalOffice.WikiService.Models.Dto.Requests;
 using LT.DigitalOffice.WikiService.Mappers.Db.Interfaces;
 using LT.DigitalOffice.WikiService.Models.Dto.Requests.Filters;
 using LT.DigitalOffice.WikiService.Models.Db;

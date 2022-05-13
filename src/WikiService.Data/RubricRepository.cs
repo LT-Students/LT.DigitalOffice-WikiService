@@ -37,19 +37,18 @@ namespace LT.DigitalOffice.WikiService.Data
           ? dbRubric.Where(rubric => rubric.IsActive == true)
           : dbRubric.Where(rubric => rubric.IsActive == false);
       }
-
       else
       {
         dbRubric = dbRubric.OrderByDescending(rubric => rubric.CreatedAtUtc);
       }
 
-      foreach(var rubric in dbRubric)
+      foreach(DbRubric topRubric in dbRubric)
       {
-        foreach (var id in _provider.Rubrics.AsQueryable())
+        foreach (DbRubric rubric in _provider.Rubrics.AsQueryable())
         {
-          if (id.ParentId == rubric.Id)
+          if (rubric.ParentId == topRubric.Id)
           {
-            rubric.HasChild = true;
+            topRubric.HasChild = true;
             break;
           }
         }         
