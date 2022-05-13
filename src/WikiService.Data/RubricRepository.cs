@@ -51,7 +51,18 @@ namespace LT.DigitalOffice.WikiService.Data
             topRubric.HasChild = true;
             break;
           }
-        }         
+        }
+
+        if (!topRubric.HasChild) { 
+          foreach (DbArticle article in _provider.Articles.AsQueryable())
+          {
+            if (article.RubricId == topRubric.Id)
+            {
+              topRubric.HasChild = true;
+              break;
+            }
+          }
+        }
       }
 
       return dbRubric;
