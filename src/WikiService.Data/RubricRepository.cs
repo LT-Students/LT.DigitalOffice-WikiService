@@ -33,9 +33,7 @@ namespace LT.DigitalOffice.WikiService.Data
 
       if (filter.IsActive.HasValue)
       {
-        dbRubric = filter.IsActive.Value
-          ? dbRubric.Where(rubric => rubric.IsActive == true)
-          : dbRubric.Where(rubric => rubric.IsActive == false);
+        dbRubric = dbRubric.Where(rubric => rubric.IsActive == filter.IsActive.Value);
       }
       else
       {
@@ -67,6 +65,7 @@ namespace LT.DigitalOffice.WikiService.Data
 
       return dbRubric;
     }
+
     public RubricRepository(
       IDataProvider provider)
     {
