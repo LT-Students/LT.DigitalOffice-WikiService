@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric
 {
   public class CreateRubricCommand : ICreateRubricCommand
-    {
+  {
     private readonly IRubricRepository _repository;
     private readonly IDbRubricMapper _mapper;
     private readonly ICreateRubricRequestValidator _validator;
@@ -35,8 +35,11 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric
       _httpContextAccessor = httpContextAccessor;
       _responseCreator = responseCreator;
     }
+
     public async Task<OperationResultResponse<Guid?>> ExecuteAsync(CreateRubricRequest request)
     {
+      //add check rights
+
       ValidationResult validationResult = await _validator.ValidateAsync(request);
 
       if (!validationResult.IsValid)
@@ -48,7 +51,7 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric
       OperationResultResponse<Guid?> response = new();
       response.Body = await _repository.CreateAsync(_mapper.Map(request));
 
-      if (response.Body == null)
+      if (response.Body is null)
       {
         return _responseCreator.CreateFailureResponse<Guid?>(HttpStatusCode.BadRequest);
       }

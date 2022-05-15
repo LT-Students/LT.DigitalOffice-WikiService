@@ -19,16 +19,14 @@ namespace LT.DigitalOffice.WikiService.Mappers.Db
 
     public DbRubric Map(CreateRubricRequest request)
     {
-      if (request == null)
+      if (request is null)
       {
         return null;
       }
 
-      Guid rubricId = Guid.NewGuid();
-
       return new DbRubric
       {
-        Id = rubricId,
+        Id = Guid.NewGuid(),
         Name = request.Name.Trim(),
         ParentId = request.ParentId,
         IsActive = true,

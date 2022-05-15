@@ -7,6 +7,5 @@ namespace LT.DigitalOffice.WikiService.Validation.Rubric.Interfaces
   [AutoInject]
   public interface ICreateRubricRequestValidator : IValidator<CreateRubricRequest>
   {
-
   }
 }

@@ -1,7 +1,11 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\src",
+    "\\src\\WikiService",
+    "\\src\\WikiService.Validation",
+    "\\src\\WikiService.Validation\\Rubric"
   ],
-  "SelectedNode": "\\LT.DigitalOffice.WikiService.sln",
+  "SelectedNode": "\\src\\WikiService\\appsettings.json",
   "PreviewInSolutionExplorer": false
 }

@@ -10,10 +10,8 @@ namespace LT.DigitalOffice.WikiService.Data.Interfaces
   {
     Task<Guid?> CreateAsync(DbRubric dbRubric);
 
-    Task<bool> DoesExistAsync(Guid rubricParentId);
+    Task<bool> DoesRubricIdExistAsync(Guid rubricId);
 
-    Task<bool> DoesSubrubricNameExistAsync(Guid rubricParentId, string nameRubric);
-
-    Task<bool> DoesRubricNameExistAsync(string name);
+    Task<bool> DoesRubricNameExistAsync(Guid? rubricParentId, string nameRubric);
   }
 }

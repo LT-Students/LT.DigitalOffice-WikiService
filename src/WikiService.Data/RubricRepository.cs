@@ -18,7 +18,7 @@ namespace LT.DigitalOffice.WikiService.Data
     }
     public async Task<Guid?> CreateAsync(DbRubric dbRubric)
     {
-      if (dbRubric == null)
+      if (dbRubric is null)
       {
         return null;
       }
@@ -29,19 +29,14 @@ namespace LT.DigitalOffice.WikiService.Data
       return dbRubric.Id;
     }
 
-    public async Task<bool> DoesExistAsync(Guid rubricParentId)
+    public async Task<bool> DoesRubricIdExistAsync(Guid rubricId)
     {
-      return await _provider.Rubrics.AnyAsync(x => x.Id == rubricParentId);
+      return await _provider.Rubrics.AnyAsync(x => x.Id == rubricId);
     }
 
-    public async Task<bool> DoesSubrubricNameExistAsync(Guid rubricParentId, string nameRubric)
+    public async Task<bool> DoesRubricNameExistAsync(Guid? rubricParentId, string nameRubric)
     {
       return await _provider.Rubrics.AnyAsync(p => p.ParentId.Value == rubricParentId && p.Name == nameRubric);
-    }
-
-    public async Task<bool> DoesRubricNameExistAsync(string name)
-    {
-      return await _provider.Rubrics.AnyAsync(p => !p.ParentId.HasValue && p.Name.Equals(name));
     }
   }
 }

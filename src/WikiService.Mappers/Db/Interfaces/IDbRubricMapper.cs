@@ -5,8 +5,8 @@ using LT.DigitalOffice.WikiService.Models.Dto.Requests;
 namespace LT.DigitalOffice.WikiService.Mappers.Db.Interfaces
 {
   [AutoInject]
-  public  interface IDbRubricMapper
-    {
+  public interface IDbRubricMapper
+  {
     DbRubric Map(CreateRubricRequest request);
   }
 }
