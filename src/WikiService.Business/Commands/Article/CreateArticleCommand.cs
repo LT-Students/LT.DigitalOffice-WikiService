@@ -21,6 +21,7 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Article
     private readonly ICreateArticleRequestValidator _validator;
     private readonly IResponseCreator _responseCreator;
     private readonly IHttpContextAccessor _httpContextAccessor;
+
     public CreateArticleCommand(
      IArticleRepository repository,
      IDbArticleMapper mapper,
@@ -34,6 +35,7 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Article
       _responseCreator = responseCreator;
       _httpContextAccessor = httpContextAccessor;
     }
+
     public async Task<OperationResultResponse<Guid?>> ExecuteAsync(CreateArticleRequest request)
     {
       //add check rights

@@ -16,6 +16,7 @@ namespace LT.DigitalOffice.WikiService.Mappers.Db
     {
       _httpContextAccessor = httpContextAccessor;
     }
+
     public DbArticle Map(CreateArticleRequest request)
     {
       if (request is null)
@@ -29,11 +30,9 @@ namespace LT.DigitalOffice.WikiService.Mappers.Db
         Name = request.Name,
         Content = request.Content,
         RubricId = request.RubricId,
-        IsActive = request.IsActive,
+        IsActive = true,
         CreatedBy = _httpContextAccessor.HttpContext.GetUserId(),
-        CreatedAtUtc = DateTime.UtcNow,
-        ModifiedBy = request.IsActive ? _httpContextAccessor.HttpContext.GetUserId() : null,
-        ModifiedAtUtc = request.IsActive ? DateTime.UtcNow : null
+        CreatedAtUtc = DateTime.UtcNow
       };
     }
   }

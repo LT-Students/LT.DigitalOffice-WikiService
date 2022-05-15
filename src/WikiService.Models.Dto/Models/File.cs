@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace LT.DigitalOffice.WikiService.Models.Dto.Models
 {
-  public class File
+  public record File
   {
     public string Name { get; set; }
     public string Content { get; set; }
