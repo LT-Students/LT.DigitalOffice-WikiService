@@ -27,9 +27,6 @@ namespace LT.DigitalOffice.WikiService.Validation.Article
 
       RuleFor(article => article.Content)
         .NotEmpty().WithMessage("Content must not be empty.");
-
-
-
     }
   }
 }
