@@ -3,9 +3,12 @@
     "",
     "\\src",
     "\\src\\WikiService",
+    "\\src\\WikiService.Data",
+    "\\src\\WikiService.Models.Dto",
+    "\\src\\WikiService.Models.Dto\\Requests",
     "\\src\\WikiService.Validation",
     "\\src\\WikiService.Validation\\Rubric"
   ],
-  "SelectedNode": "\\src\\WikiService\\appsettings.json",
+  "SelectedNode": "\\src\\WikiService.Models.Dto\\Requests\\CreateRubricRequest.cs",
   "PreviewInSolutionExplorer": false
 }

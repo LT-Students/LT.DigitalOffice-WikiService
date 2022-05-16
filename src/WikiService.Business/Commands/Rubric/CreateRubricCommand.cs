@@ -1,4 +1,6 @@
 ﻿using FluentValidation.Results;
+using LT.DigitalOffice.Kernel.BrokerSupport.AccessValidatorEngine.Interfaces;
+using LT.DigitalOffice.Kernel.Constants;
 using LT.DigitalOffice.Kernel.Helpers.Interfaces;
 using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.WikiService.Business.Commands.Interfaces;
@@ -19,6 +21,7 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric
     private readonly IRubricRepository _repository;
     private readonly IDbRubricMapper _mapper;
     private readonly ICreateRubricRequestValidator _validator;
+    private readonly IAccessValidator _accessValidator;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IResponseCreator _responseCreator;
 
@@ -26,19 +29,24 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric
       IRubricRepository repository,
       IDbRubricMapper mapper,
       ICreateRubricRequestValidator validator,
+      IAccessValidator accessValidator,
       IHttpContextAccessor httpContextAccessor,
       IResponseCreator responseCreator)
     {
       _repository = repository;
       _mapper = mapper;
       _validator = validator;
+      _accessValidator = accessValidator;
       _httpContextAccessor = httpContextAccessor;
       _responseCreator = responseCreator;
     }
 
     public async Task<OperationResultResponse<Guid?>> ExecuteAsync(CreateRubricRequest request)
     {
-      //add check rights
+      if (!await _accessValidator.HasRightsAsync(Rights.AddEditRemoveWiki))
+      {
+        return _responseCreator.CreateFailureResponse<Guid?>(HttpStatusCode.Forbidden);
+      }
 
       ValidationResult validationResult = await _validator.ValidateAsync(request);
 
