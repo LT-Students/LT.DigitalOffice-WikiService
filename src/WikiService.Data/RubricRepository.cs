@@ -6,10 +6,7 @@ using LT.DigitalOffice.WikiService.Data.Interfaces;
 using LT.DigitalOffice.WikiService.Data.Provider;
 using LT.DigitalOffice.WikiService.Models.Db;
 using LT.DigitalOffice.WikiService.Models.Dto.Requests.Rubric.Filters;
-using LT.DigitalOffice.WikiService.Models.Db;
-using Microsoft.EntityFrameworkCore;
 using System;
-using System.Threading.Tasks;
 
 namespace LT.DigitalOffice.WikiService.Data
 {
@@ -91,6 +88,7 @@ namespace LT.DigitalOffice.WikiService.Data
         await dbRubric.Skip(filter.SkipCount).Take(filter.TakeCount).ToListAsync(),
         await dbRubric.CountAsync());
     }
+
     public async Task<Guid?> CreateAsync(DbRubric dbRubric)
     {
       if (dbRubric is null)

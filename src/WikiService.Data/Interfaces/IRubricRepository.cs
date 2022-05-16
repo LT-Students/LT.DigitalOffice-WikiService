@@ -2,10 +2,8 @@
 using LT.DigitalOffice.WikiService.Models.Db;
 using System;
 using System.Threading.Tasks;
-using LT.DigitalOffice.WikiService.Models.Db;
 using LT.DigitalOffice.WikiService.Models.Dto.Requests.Rubric.Filters;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace LT.DigitalOffice.WikiService.Data.Interfaces
 {
@@ -17,6 +15,7 @@ namespace LT.DigitalOffice.WikiService.Data.Interfaces
     Task<bool> DoesExistAsync(Guid rubricId);
 
     Task<bool> DoesRubricNameExistAsync(Guid? rubricParentId, string nameRubric);
+
     Task<(List<DbRubric> dbRubric, int totalCount)> FindAsync(FindRubricFilter filter);
   }
 }
