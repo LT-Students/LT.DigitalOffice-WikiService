@@ -21,8 +21,8 @@ namespace LT.DigitalOffice.WikiService.Validation.Rubric
         RuleFor(request => request.ParentId)
           .NotEmpty()
           .WithMessage("ParentId must not be empty.")
-          .MustAsync(async (parentId, _) => await rubricRepository.DoesRubricIdExistAsync(parentId.Value))
-          .WithMessage("This rubric id does not exist.")
+          .MustAsync(async (parentId, _) => await rubricRepository.DoesExistAsync(parentId.Value))
+          .WithMessage("This rubric id doesn't exist.")
           .DependentRules(() =>
           {
             RuleFor(request => request)

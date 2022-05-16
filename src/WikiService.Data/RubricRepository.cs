@@ -29,7 +29,7 @@ namespace LT.DigitalOffice.WikiService.Data
       return dbRubric.Id;
     }
 
-    public async Task<bool> DoesRubricIdExistAsync(Guid rubricId)
+    public async Task<bool> DoesExistAsync(Guid rubricId)
     {
       return await _provider.Rubrics.AnyAsync(x => x.Id == rubricId);
     }
