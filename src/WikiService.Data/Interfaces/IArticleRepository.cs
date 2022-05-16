@@ -9,7 +9,6 @@ namespace LT.DigitalOffice.WikiService.Data.Interfaces
   public interface IArticleRepository
   {
     Task<Guid?> CreateAsync(DbArticle dbArticle);
-    Task<bool> DoesExistAsync(Guid rubricId);
     Task<bool> DoesSameArticleNameExistAsync(Guid rubricId, string articleName);
   }
 }

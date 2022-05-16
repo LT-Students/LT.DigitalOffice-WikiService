@@ -20,4 +20,3 @@ namespace LT.DigitalOffice.WikiService.Controllers
     }
   }
 }
-

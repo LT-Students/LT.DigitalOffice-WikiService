@@ -8,6 +8,7 @@ namespace LT.DigitalOffice.WikiService.Validation.Article
   public class CreateArticleRequestValidator : AbstractValidator<CreateArticleRequest>, ICreateArticleRequestValidator
   {
     public CreateArticleRequestValidator(
+      IRubricRepository rubricRepository,
       IArticleRepository articleRepository)
     {
 
@@ -15,7 +16,7 @@ namespace LT.DigitalOffice.WikiService.Validation.Article
 
       RuleFor(article => article.RubricId)
         .NotEmpty().WithMessage("Rubric id must not be empty.")
-        .MustAsync(async (rubricId, _) => await articleRepository.DoesExistAsync(rubricId))
+        .MustAsync(async (rubricId, _) => await rubricRepository.DoesExistAsync(rubricId))
           .WithMessage("This rubric id does not exist.");
 
       RuleFor(article => article.Name)
