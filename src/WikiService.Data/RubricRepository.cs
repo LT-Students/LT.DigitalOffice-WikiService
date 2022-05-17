@@ -6,6 +6,7 @@ using LT.DigitalOffice.WikiService.Data.Interfaces;
 using LT.DigitalOffice.WikiService.Data.Provider;
 using LT.DigitalOffice.WikiService.Models.Db;
 using LT.DigitalOffice.WikiService.Models.Dto.Requests.Rubric.Filters;
+using System;
 
 namespace LT.DigitalOffice.WikiService.Data
 {
@@ -86,6 +87,29 @@ namespace LT.DigitalOffice.WikiService.Data
       return (
         await dbRubric.Skip(filter.SkipCount).Take(filter.TakeCount).ToListAsync(),
         await dbRubric.CountAsync());
+    }
+
+    public async Task<Guid?> CreateAsync(DbRubric dbRubric)
+    {
+      if (dbRubric is null)
+      {
+        return null;
+      }
+
+      _provider.Rubrics.Add(dbRubric);
+      await _provider.SaveAsync();
+
+      return dbRubric.Id;
+    }
+
+    public async Task<bool> DoesExistAsync(Guid rubricId)
+    {
+      return await _provider.Rubrics.AnyAsync(x => x.Id == rubricId);
+    }
+
+    public async Task<bool> DoesRubricNameExistAsync(Guid? rubricParentId, string nameRubric)
+    {
+      return await _provider.Rubrics.AnyAsync(p => p.ParentId == rubricParentId && p.Name == nameRubric);
     }
   }
 }
