@@ -12,7 +12,7 @@ namespace LT.DigitalOffice.WikiService.Validation.Rubric
     {
       CascadeMode = CascadeMode.Stop;
 
-      RuleFor(rubric => rubric.Name.Trim())
+      RuleFor(rubric => rubric.Name)
         .MaximumLength(150)
         .WithMessage("Rubric name is too long.");
 
@@ -22,21 +22,12 @@ namespace LT.DigitalOffice.WikiService.Validation.Rubric
           .NotEmpty()
           .WithMessage("ParentId must not be empty.")
           .MustAsync(async (parentId, _) => await rubricRepository.DoesExistAsync(parentId.Value))
-          .WithMessage("This rubric id doesn't exist.")
-          .DependentRules(() =>
-          {
-            RuleFor(request => request)
-           .MustAsync(async (request, _) => !await rubricRepository.DoesRubricNameExistAsync(request.ParentId.Value, request.Name))
-           .WithMessage("This subrubric name already exists.");
-          });
+          .WithMessage("This rubric id doesn't exist.");
       });
 
-      When(rubric => !rubric.ParentId.HasValue, () =>
-      {
-        RuleFor(request => request.Name)
-          .MustAsync(async (name, _) => !await rubricRepository.DoesRubricNameExistAsync(null, name))
-          .WithMessage("This rubric name already exists.");
-      });
+      RuleFor(request => request)
+        .MustAsync(async (request, _) => !await rubricRepository.DoesRubricNameExistAsync(request.ParentId, request.Name))
+        .WithMessage("This rubric name already exists.");
     }
   }
 }

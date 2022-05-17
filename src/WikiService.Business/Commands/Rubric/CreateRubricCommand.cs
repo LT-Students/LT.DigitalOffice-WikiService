@@ -43,7 +43,7 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric
 
     public async Task<OperationResultResponse<Guid?>> ExecuteAsync(CreateRubricRequest request)
     {
-      if (!await _accessValidator.HasRightsAsync(Rights.AddEditRemoveWiki))
+      if (!await _accessValidator.HasRightsAsync(Rights.AddEditRemoveProjects))
       {
         return _responseCreator.CreateFailureResponse<Guid?>(HttpStatusCode.Forbidden);
       }
