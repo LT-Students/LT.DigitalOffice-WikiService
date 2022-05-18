@@ -25,7 +25,7 @@ namespace LT.DigitalOffice.WikiService.Data
       }
 
       if (filter.IsAscendingSort.HasValue)
-      {
+      {        
         dbRubric = filter.IsAscendingSort.Value
           ? dbRubric.OrderBy(rubric => rubric.Name)
           : dbRubric.OrderByDescending(rubric => rubric.Name);
@@ -40,9 +40,9 @@ namespace LT.DigitalOffice.WikiService.Data
         dbRubric = dbRubric.OrderByDescending(rubric => rubric.CreatedAtUtc);
       }
 
-      foreach(DbRubric topRubric in dbRubric)
+      foreach(DbRubric topRubric in dbRubric.ToList())
       {
-        foreach (DbRubric rubric in _provider.Rubrics.AsQueryable())
+        foreach (DbRubric rubric in _provider.Rubrics.AsEnumerable())
         {
           if (rubric.ParentId == topRubric.Id)
           {
@@ -52,7 +52,7 @@ namespace LT.DigitalOffice.WikiService.Data
         }
 
         if (!topRubric.HasChild) { 
-          foreach (DbArticle article in _provider.Articles.AsQueryable())
+          foreach (DbArticle article in _provider.Articles.AsEnumerable())
           {
             if (article.RubricId == topRubric.Id)
             {
@@ -82,10 +82,10 @@ namespace LT.DigitalOffice.WikiService.Data
       IQueryable<DbRubric> dbRubric = CreateFindPredicates(
         filter,
         _provider.Rubrics.AsQueryable().Where(rubric => rubric.ParentId == null));
-    
+
       return (
         await dbRubric.Skip(filter.SkipCount).Take(filter.TakeCount).ToListAsync(),
         await dbRubric.CountAsync());
     }
   }
-}
+}  
