@@ -40,6 +40,8 @@ namespace LT.DigitalOffice.WikiService.Models.Db
       builder
         .HasMany(a => a.Articles)
         .WithOne(r => r.Rubric);
+
+      builder.Ignore(x => x.HasChild);
     }
   }
 }

@@ -3,12 +3,15 @@
     "",
     "\\src",
     "\\src\\WikiService",
+    "\\src\\WikiService.Business",
+    "\\src\\WikiService.Business\\Commands",
+    "\\src\\WikiService.Business\\Commands\\Rubric",
     "\\src\\WikiService.Data",
     "\\src\\WikiService.Models.Dto",
     "\\src\\WikiService.Models.Dto\\Requests",
     "\\src\\WikiService.Validation",
     "\\src\\WikiService.Validation\\Rubric"
   ],
-  "SelectedNode": "\\LT.DigitalOffice.WikiService.sln",
+  "SelectedNode": "\\src\\WikiService\\appsettings.json",
   "PreviewInSolutionExplorer": false
 }

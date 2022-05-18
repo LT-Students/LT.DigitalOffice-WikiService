@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace LT.DigitalOffice.WikiService.Data.Provider.MsSql.Ef.Migrations
 {
   [DbContext(typeof(WikiServiceDbContext))]
-  [Migration("20220517220000_InitialCreate")]
+  [Migration("20220518170000_InitialCreate")]
   public class InitialCreate : Migration
   {
     private void CreateTableRubrics(MigrationBuilder migrationBuilder)
@@ -20,7 +20,6 @@ namespace LT.DigitalOffice.WikiService.Data.Provider.MsSql.Ef.Migrations
           Name = table.Column<string>(nullable: false),
           ParentId = table.Column<Guid>(nullable: true),
           IsActive = table.Column<bool>(nullable: false),
-          HasChild = table.Column<bool>(nullable: false),
           CreatedBy = table.Column<Guid>(nullable: false),
           CreatedAtUtc = table.Column<DateTime>(nullable: false),
           ModifiedBy = table.Column<Guid>(nullable: true),
