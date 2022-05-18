@@ -11,23 +11,19 @@ namespace LT.DigitalOffice.WikiService.Validation.Article
       IRubricRepository rubricRepository,
       IArticleRepository articleRepository)
     {
-
       CascadeMode = CascadeMode.Stop;
 
       RuleFor(article => article.RubricId)
-        .NotEmpty().WithMessage("Rubric id must not be empty.")
         .MustAsync(async (rubricId, _) => await rubricRepository.DoesExistAsync(rubricId))
-          .WithMessage("This rubric id does not exist.");
+        .WithMessage("This rubric id does not exist.");
 
       RuleFor(article => article.Name)
-        .NotEmpty().WithMessage("Name must not be empty.");
+        .MaximumLength(150)
+        .WithMessage("Article name is too long.");
 
       RuleFor(article => article)
-        .MustAsync(async (article, _) => !await articleRepository.DoesSameArticleNameExistAsync(article.RubricId, article.Name))
+        .MustAsync(async (article, _) => !await articleRepository.DoesSameNameExistAsync(article.RubricId, article.Name))
         .WithMessage("This article name already exists.");
-
-      RuleFor(article => article.Content)
-        .NotEmpty().WithMessage("Content must not be empty.");
     }
   }
 }

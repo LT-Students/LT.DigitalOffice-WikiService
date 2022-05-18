@@ -17,9 +17,9 @@ namespace LT.DigitalOffice.WikiService.Data
       _provider = provider;
     }
 
-    public async Task<bool> DoesSameArticleNameExistAsync(Guid rubricId, string articleName)
+    public async Task<bool> DoesSameNameExistAsync(Guid rubricId, string articleName)
     {
-      return await _provider.Articles.AnyAsync(r => r.RubricId == rubricId && r.Name == articleName);
+      return await _provider.Articles.AnyAsync(a => a.RubricId == rubricId && a.Name == articleName);
     }
 
     public async Task<Guid?> CreateAsync(DbArticle dbArticle)

@@ -1,13 +1,11 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
-using LT.DigitalOffice.WikiService.Data.Interfaces;
+﻿using LT.DigitalOffice.WikiService.Data.Interfaces;
 using LT.DigitalOffice.WikiService.Data.Provider;
 using LT.DigitalOffice.WikiService.Models.Db;
 using LT.DigitalOffice.WikiService.Models.Dto.Requests.Rubric.Filters;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace LT.DigitalOffice.WikiService.Data
@@ -19,7 +17,7 @@ namespace LT.DigitalOffice.WikiService.Data
     private IQueryable<DbRubric> CreateFindPredicates(
       FindRubricFilter filter,
       IQueryable<DbRubric> dbRubric)
-    {     
+    {
       if (!string.IsNullOrEmpty(filter.NameIncludeSubstring))
       {
         dbRubric = dbRubric.Where(
@@ -43,7 +41,7 @@ namespace LT.DigitalOffice.WikiService.Data
         dbRubric = dbRubric.OrderByDescending(rubric => rubric.CreatedAtUtc);
       }
 
-      foreach(DbRubric topRubric in dbRubric)
+      foreach (DbRubric topRubric in dbRubric)
       {
         foreach (DbRubric rubric in _provider.Rubrics.AsQueryable())
         {
@@ -54,7 +52,8 @@ namespace LT.DigitalOffice.WikiService.Data
           }
         }
 
-        if (!topRubric.HasChild) { 
+        if (!topRubric.HasChild)
+        {
           foreach (DbArticle article in _provider.Articles.AsQueryable())
           {
             if (article.RubricId == topRubric.Id)
@@ -85,10 +84,15 @@ namespace LT.DigitalOffice.WikiService.Data
       IQueryable<DbRubric> dbRubric = CreateFindPredicates(
         filter,
         _provider.Rubrics.AsQueryable().Where(rubric => rubric.ParentId == null));
-    
+
       return (
         await dbRubric.Skip(filter.SkipCount).Take(filter.TakeCount).ToListAsync(),
         await dbRubric.CountAsync());
+    }
+
+    public Task<bool> DoesExistAsync(Guid rubricId)
+    {
+      return _provider.Rubrics.AnyAsync(x => x.Id == rubricId);
     }
   }
 }
