@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System;
 
 namespace LT.DigitalOffice.WikiService.Data
 {
@@ -90,9 +91,27 @@ namespace LT.DigitalOffice.WikiService.Data
         await dbRubric.CountAsync());
     }
 
-    public Task<bool> DoesExistAsync(Guid rubricId)
+    public async Task<Guid?> CreateAsync(DbRubric dbRubric)
     {
-      return _provider.Rubrics.AnyAsync(x => x.Id == rubricId);
+      if (dbRubric is null)
+      {
+        return null;
+      }
+
+      _provider.Rubrics.Add(dbRubric);
+      await _provider.SaveAsync();
+
+      return dbRubric.Id;
+    }
+
+    public async Task<bool> DoesExistAsync(Guid rubricId)
+    {
+      return await _provider.Rubrics.AnyAsync(x => x.Id == rubricId);
+    }
+
+    public async Task<bool> DoesRubricNameExistAsync(Guid? rubricParentId, string nameRubric)
+    {
+      return await _provider.Rubrics.AnyAsync(p => p.ParentId == rubricParentId && p.Name == nameRubric);
     }
   }
 }
