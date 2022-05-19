@@ -41,31 +41,7 @@ namespace LT.DigitalOffice.WikiService.Data
         dbRubric = dbRubric.OrderByDescending(rubric => rubric.CreatedAtUtc);
       }
 
-      foreach (DbRubric topRubric in dbRubric)
-      {
-        foreach (DbRubric rubric in _provider.Rubrics.AsQueryable())
-        {
-          if (rubric.ParentId == topRubric.Id)
-          {
-            topRubric.HasChild = true;
-            break;
-          }
-        }
-
-        if (!topRubric.HasChild)
-        {
-          foreach (DbArticle article in _provider.Articles.AsQueryable())
-          {
-            if (article.RubricId == topRubric.Id)
-            {
-              topRubric.HasChild = true;
-              break;
-            }
-          }
-        }
-      }
-
-      return dbRubric;
+      return FindRubricChild(ref dbRubric);
     }
 
     public RubricRepository(
@@ -111,6 +87,35 @@ namespace LT.DigitalOffice.WikiService.Data
     public async Task<bool> DoesRubricNameExistAsync(Guid? rubricParentId, string nameRubric)
     {
       return await _provider.Rubrics.AnyAsync(p => p.ParentId == rubricParentId && p.Name == nameRubric);
+    }
+
+    private IQueryable<DbRubric> FindRubricChild(ref IQueryable<DbRubric> dbRubric)
+    {
+      foreach (DbRubric topRubric in dbRubric.ToList())
+      {
+        foreach (DbRubric rubric in _provider.Rubrics.AsEnumerable())
+        {
+          if (rubric.ParentId == topRubric.Id)
+          {
+            topRubric.HasChild = true;
+            break;
+          }
+        }
+
+        if (!topRubric.HasChild)
+        {
+          foreach (DbArticle article in _provider.Articles.AsEnumerable())
+          {
+            if (article.RubricId == topRubric.Id)
+            {
+              topRubric.HasChild = true;
+              break;
+            }
+          }
+        }
+      }
+
+      return dbRubric;
     }
   }
 }
