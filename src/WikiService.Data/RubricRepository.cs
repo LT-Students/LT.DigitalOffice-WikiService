@@ -16,7 +16,7 @@ namespace LT.DigitalOffice.WikiService.Data
     private IQueryable<DbRubric> CreateFindPredicates(
       FindRubricFilter filter,
       IQueryable<DbRubric> dbRubric)
-    {     
+    {
       if (!string.IsNullOrEmpty(filter.NameIncludeSubstring))
       {
         dbRubric = dbRubric.Where(
@@ -25,7 +25,7 @@ namespace LT.DigitalOffice.WikiService.Data
       }
 
       if (filter.IsAscendingSort.HasValue)
-      {        
+      {
         dbRubric = filter.IsAscendingSort.Value
           ? dbRubric.OrderBy(rubric => rubric.Name)
           : dbRubric.OrderByDescending(rubric => rubric.Name);
@@ -40,30 +40,7 @@ namespace LT.DigitalOffice.WikiService.Data
         dbRubric = dbRubric.OrderByDescending(rubric => rubric.CreatedAtUtc);
       }
 
-      foreach(DbRubric topRubric in dbRubric.ToList())
-      {
-        foreach (DbRubric rubric in _provider.Rubrics.AsEnumerable())
-        {
-          if (rubric.ParentId == topRubric.Id)
-          {
-            topRubric.HasChild = true;
-            break;
-          }
-        }
-
-        if (!topRubric.HasChild) { 
-          foreach (DbArticle article in _provider.Articles.AsEnumerable())
-          {
-            if (article.RubricId == topRubric.Id)
-            {
-              topRubric.HasChild = true;
-              break;
-            }
-          }
-        }
-      }
-
-      return dbRubric;
+      return FindRubricChild(ref dbRubric);
     }
 
     public RubricRepository(
@@ -87,5 +64,35 @@ namespace LT.DigitalOffice.WikiService.Data
         await dbRubric.Skip(filter.SkipCount).Take(filter.TakeCount).ToListAsync(),
         await dbRubric.CountAsync());
     }
+
+
+    private IQueryable<DbRubric> FindRubricChild(ref IQueryable<DbRubric> dbRubric)
+    {
+      foreach (DbRubric topRubric in dbRubric.ToList())
+      {
+        foreach (DbRubric rubric in _provider.Rubrics.AsEnumerable())
+        {
+          if (rubric.ParentId == topRubric.Id)
+          {
+            topRubric.HasChild = true;
+            break;
+          }
+        }
+
+        if (!topRubric.HasChild)
+        {
+          foreach (DbArticle article in _provider.Articles.AsEnumerable())
+          {
+            if (article.RubricId == topRubric.Id)
+            {
+              topRubric.HasChild = true;
+              break;
+            }
+          }
+        }
+      }
+
+      return dbRubric;
+    }
   }
-}  
+}
