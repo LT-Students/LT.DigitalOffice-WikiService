@@ -41,7 +41,7 @@ namespace LT.DigitalOffice.WikiService.Data
         dbRubric = dbRubric.OrderByDescending(rubric => rubric.CreatedAtUtc);
       }
 
-      return FindRubricChild(ref dbRubric);
+      return FindRubricChild(dbRubric);
     }
 
     public RubricRepository(
@@ -89,7 +89,7 @@ namespace LT.DigitalOffice.WikiService.Data
       return await _provider.Rubrics.AnyAsync(p => p.ParentId == rubricParentId && p.Name == nameRubric);
     }
 
-    private IQueryable<DbRubric> FindRubricChild(ref IQueryable<DbRubric> dbRubric)
+    private IQueryable<DbRubric> FindRubricChild(IQueryable<DbRubric> dbRubric)
     {
       foreach (DbRubric topRubric in dbRubric.ToList())
       {
