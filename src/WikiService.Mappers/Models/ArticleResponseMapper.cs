@@ -22,7 +22,7 @@ namespace LT.DigitalOffice.WikiService.Mappers.Models
         IsActive = dbArticle.IsActive,
         RubricId = dbArticle.RubricId,
         Files = dbArticle.Files
-                ?.Select(f => f.FileId).ToList(),
+          ?.Select(f => f.FileId).ToList(),
       };
     }
   }

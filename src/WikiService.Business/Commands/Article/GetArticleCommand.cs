@@ -35,7 +35,7 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Article
       if (request.ArticleId is null)
       {
         return _responseCreator.CreateFailureResponse<ArticleResponse>(HttpStatusCode.BadRequest,
-                                       new List<string> { "You must specify 'ArticleId'." });
+          new List<string> { "You must specify 'ArticleId'." });
       }
 
       OperationResultResponse<ArticleResponse> response = new();
@@ -43,9 +43,7 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Article
       DbArticle dbArticle = await _articleRepository.GetAsync(request);
 
       response.Body = _articleResponseMapper.Map(dbArticle);
-      response.Status = response.Errors.Any()
-        ? OperationResultStatusType.PartialSuccess
-        : OperationResultStatusType.FullSuccess;
+      response.Status = OperationResultStatusType.FullSuccess;
 
       return response;
     }

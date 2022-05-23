@@ -47,9 +47,10 @@ namespace LT.DigitalOffice.WikiService.Data
       DbArticle dbArticle = await _provider.Articles
         .FirstOrDefaultAsync(article => article.Id == request.ArticleId);
 
-      if(dbArticle is not null) { 
-      dbArticle.Files = await _provider.ArticlesFiles
-        .Where(f => f.ArticleId == dbArticle.Id).ToListAsync();
+      if (dbArticle is not null) 
+      {
+        dbArticle.Files = await _provider.ArticlesFiles
+          .Where(f => f.ArticleId == dbArticle.Id).ToListAsync();
       }
 
       return dbArticle;
