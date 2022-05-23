@@ -8,10 +8,11 @@ using Microsoft.AspNetCore.JsonPatch.Operations;
 using LT.DigitalOffice.WikiService.Models.Dto.Requests.Article;
 using LT.DigitalOffice.WikiService.Validation.Article.Interfaces;
 using LT.DigitalOffice.WikiService.Data.Interfaces;
+using LT.DigitalOffice.WikiService.Models.Db;
 
 namespace LT.DigitalOffice.WikiService.Validation.Article
 {
-  public class EditArticleRequestValidator : ExtendedEditRequestValidator<Guid, EditArticleRequest>, IEditArticleRequestValidator
+  public class EditArticleRequestValidator : ExtendedEditRequestValidator<DbArticle, EditArticleRequest>, IEditArticleRequestValidator
   {
     private readonly IArticleRepository _articleRepository;
     private readonly IRubricRepository _rubricRepository;
@@ -97,21 +98,21 @@ namespace LT.DigitalOffice.WikiService.Validation.Article
       {
         _articleRepository = articleRepository;
         _rubricRepository = rubricRepository;
-        Guid _rubricId = default;
+        Guid _currentRubricId = default;
+        string _currentArticleName = default;
 
         RuleFor(x => x)
           .MustAsync(async (x, _) =>
           {
             foreach (Operation<EditArticleRequest> item in x.Item2.Operations)
             {
-              _rubricId = item.path.EndsWith(nameof(EditArticleRequest.RubricId)) ? Guid.Parse(item.value.ToString()) : x.Item1;
+              _currentRubricId = item.path.EndsWith(nameof(EditArticleRequest.RubricId)) ? Guid.Parse(item.value.ToString()) : x.Item1.RubricId;
             }
             foreach (Operation<EditArticleRequest> item in x.Item2.Operations)
             {
-              return item.path.EndsWith(nameof(EditArticleRequest.Name))
-                ? !await _articleRepository.DoesSameNameExistAsync(_rubricId, item.value.ToString())
-                : true;
+              _currentArticleName = item.path.EndsWith(nameof(EditArticleRequest.Name)) ? item.value.ToString() : x.Item1.Name;
             }
+            return !await _articleRepository.DoesSameNameExistAsync(_currentRubricId, _currentArticleName);
           })
           .WithMessage("That article name already exists in this rubric.");
 
