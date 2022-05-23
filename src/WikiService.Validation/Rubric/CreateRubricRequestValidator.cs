@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 using LT.DigitalOffice.WikiService.Data.Interfaces;
-using LT.DigitalOffice.WikiService.Models.Dto.Requests;
+using LT.DigitalOffice.WikiService.Models.Dto.Requests.Rubric;
 using LT.DigitalOffice.WikiService.Validation.Rubric.Interfaces;
 
 namespace LT.DigitalOffice.WikiService.Validation.Rubric

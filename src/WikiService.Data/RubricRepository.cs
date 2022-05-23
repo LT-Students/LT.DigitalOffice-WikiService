@@ -1,7 +1,10 @@
-﻿using LT.DigitalOffice.WikiService.Data.Interfaces;
+﻿using LT.DigitalOffice.Kernel.Extensions;
+using LT.DigitalOffice.WikiService.Data.Interfaces;
 using LT.DigitalOffice.WikiService.Data.Provider;
 using LT.DigitalOffice.WikiService.Models.Db;
 using LT.DigitalOffice.WikiService.Models.Dto.Requests.Rubric.Filters;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -13,6 +16,15 @@ namespace LT.DigitalOffice.WikiService.Data
   public class RubricRepository : IRubricRepository
   {
     private readonly IDataProvider _provider;
+    private readonly IHttpContextAccessor _httpContextAccessor;
+
+    public RubricRepository(
+      IDataProvider provider,
+      IHttpContextAccessor httpContextAccessor)
+    {
+      _provider = provider;
+      _httpContextAccessor = httpContextAccessor;
+    }
 
     private IQueryable<DbRubric> CreateFindPredicates(
       FindRubricFilter filter,
@@ -101,6 +113,24 @@ namespace LT.DigitalOffice.WikiService.Data
       await _provider.SaveAsync();
 
       return dbRubric.Id;
+    }
+
+    public async Task<bool> EditAsync(Guid rubricId, JsonPatchDocument<DbRubric> request)
+    {
+      DbRubric dbRubric = await _provider.Rubrics.FirstOrDefaultAsync(p => p.Id == rubricId);
+
+      if (dbRubric == null)
+      {
+        return false;
+      }
+
+      request.ApplyTo(dbRubric);
+      dbRubric.ModifiedBy = _httpContextAccessor.HttpContext.GetUserId();
+      dbRubric.ModifiedAtUtc = DateTime.UtcNow;
+
+      await _provider.SaveAsync();
+
+      return true;
     }
 
     public async Task<bool> DoesExistAsync(Guid rubricId)

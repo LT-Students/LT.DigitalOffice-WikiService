@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace LT.DigitalOffice.WikiService.Models.Dto.Requests
+namespace LT.DigitalOffice.WikiService.Models.Dto.Requests.Rubric
 {
   public record CreateRubricRequest
   {
