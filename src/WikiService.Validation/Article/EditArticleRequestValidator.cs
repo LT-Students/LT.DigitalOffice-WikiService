@@ -107,9 +107,6 @@ namespace LT.DigitalOffice.WikiService.Validation.Article
             foreach (Operation<EditArticleRequest> item in x.Item2.Operations)
             {
               _currentRubricId = item.path.EndsWith(nameof(EditArticleRequest.RubricId)) ? Guid.Parse(item.value.ToString()) : x.Item1.RubricId;
-            }
-            foreach (Operation<EditArticleRequest> item in x.Item2.Operations)
-            {
               _currentArticleName = item.path.EndsWith(nameof(EditArticleRequest.Name)) ? item.value.ToString() : x.Item1.Name;
             }
             return !await _articleRepository.DoesSameNameExistAsync(_currentRubricId, _currentArticleName);
