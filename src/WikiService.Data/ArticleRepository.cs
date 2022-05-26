@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore;
 using LT.DigitalOffice.WikiService.Data.Interfaces;
 using LT.DigitalOffice.WikiService.Data.Provider;
 using LT.DigitalOffice.WikiService.Models.Db;
-using LT.DigitalOffice.WikiService.Models.Dto.Requests.Article;
 
 namespace LT.DigitalOffice.WikiService.Data
 {
@@ -37,23 +36,10 @@ namespace LT.DigitalOffice.WikiService.Data
       return dbArticle.Id;
     }
 
-    public async Task<DbArticle> GetAsync(GetArticleRequest request)
-    {
-      if (request is null)
-      {
-        return null;
-      }
-
-      DbArticle dbArticle = await _provider.Articles
-        .FirstOrDefaultAsync(article => article.Id == request.ArticleId);
-
-      if (dbArticle is not null) 
-      {
-        dbArticle.Files = await _provider.ArticlesFiles
-          .Where(f => f.ArticleId == dbArticle.Id).ToListAsync();
-      }
-
-      return dbArticle;
+    public async Task<DbArticle> GetAsync(Guid articleId)
+    {  
+      return await _provider.Articles.Include(a => a.Files)
+        .FirstOrDefaultAsync(article => article.Id == articleId);
     }
   }
 }

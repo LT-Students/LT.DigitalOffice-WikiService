@@ -23,9 +23,9 @@ namespace LT.DigitalOffice.WikiService.Controllers
     [HttpGet("get")]
     public async Task<OperationResultResponse<ArticleResponse>> GetAsync(
       [FromServices] IGetArticleCommand command,
-      [FromQuery] GetArticleRequest request)
+      [FromQuery] Guid articleId)
     {
-      return await command.ExecuteAsync(request);
+      return await command.ExecuteAsync(articleId);
     }
   }
 }
