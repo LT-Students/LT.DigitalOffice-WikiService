@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace LT.DigitalOffice.WikiService.Data
@@ -62,7 +63,7 @@ namespace LT.DigitalOffice.WikiService.Data
         _provider.Rubrics.AsQueryable().Where(rubric => rubric.ParentId == null));
 
       return (
-        await FindRubricChild(dbRubric.Skip(filter.SkipCount).Take(filter.TakeCount)).ToListAsync(),
+        await FindRubricChild(dbRubric.Skip(filter.SkipCount).Take(filter.TakeCount)),
         await dbRubric.CountAsync());
     }
 
@@ -89,9 +90,9 @@ namespace LT.DigitalOffice.WikiService.Data
       return await _provider.Rubrics.AnyAsync(p => p.ParentId == rubricParentId && p.Name == nameRubric);
     }
 
-    private IQueryable<DbRubric> FindRubricChild(IQueryable<DbRubric> dbRubric)
+    private async Task<List<DbRubric>> FindRubricChild(IQueryable<DbRubric> dbRubrics)
     {
-      foreach (DbRubric topRubric in dbRubric.ToList())// to rewrite with Any()
+      foreach (DbRubric topRubric in dbRubrics.ToList())//todo - to rewrite the next foreach with Any()
       {
         foreach (DbRubric rubric in _provider.Rubrics.AsEnumerable())
         {
@@ -115,7 +116,7 @@ namespace LT.DigitalOffice.WikiService.Data
         }
       }
 
-      return dbRubric;
+      return await dbRubrics.ToListAsync();
     }
   }
 }
