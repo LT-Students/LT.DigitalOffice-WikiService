@@ -8,7 +8,6 @@ using LT.DigitalOffice.WikiService.Models.Dto.Responses.Article;
 using LT.DigitalOffice.WikiService.Mappers.Models.Interfaces;
 using LT.DigitalOffice.WikiService.Business.Commands.Article.Interfaces;
 
-
 namespace LT.DigitalOffice.WikiService.Business.Commands.Article
 {
   public class GetArticleCommand : IGetArticleCommand
@@ -33,7 +32,8 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Article
 
       response.Body = _articleResponseMapper.Map(await _articleRepository.GetAsync(articleId));
 
-      return response.Body == null ? _responseCreator.CreateFailureResponse<ArticleResponse>(HttpStatusCode.NotFound)
+      return response.Body == null
+        ? _responseCreator.CreateFailureResponse<ArticleResponse>(HttpStatusCode.NotFound)
         : response;
     }
   }
