@@ -2,4 +2,8 @@
 
 	<Import Project="$(ProjectDir)..\..\Common.Configurations.targets" />
 
+	<ItemGroup>
+	  <ProjectReference Include="..\WikiService.Models.Db\WikiService.Models.Db.csproj" />
+	</ItemGroup>
+
 </Project>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using LT.DigitalOffice.Kernel.BrokerSupport.Attributes.ParseEntity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -18,6 +19,7 @@ namespace LT.DigitalOffice.WikiService.Models.Db
     public DateTime CreatedAtUtc { get; set; }
     public Guid? ModifiedBy { get; set; }
     public DateTime? ModifiedAtUtc { get; set; }
+
 
     public ICollection<DbArticle> Articles { get; set; }
 

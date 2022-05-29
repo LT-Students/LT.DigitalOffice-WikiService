@@ -112,5 +112,32 @@ namespace LT.DigitalOffice.WikiService.Data
     {
       return await _provider.Rubrics.AnyAsync(p => p.ParentId == rubricParentId && p.Name == nameRubric);
     }
+
+    public async Task<List<DbRubric>> GetSubRubricsAsync(GetRubricFilter filter)
+    {
+      IQueryable<DbRubric> dbRubrics = _provider.Rubrics.AsQueryable();
+
+      if (filter.IncludeSubRubrics)
+      {
+        return await dbRubrics
+          .Where(x => x.ParentId == filter.RubricId)
+          .ToListAsync();
+      }
+
+      return null;
+    }
+
+    public async Task<DbRubric> GetAsync(GetRubricFilter filter)
+    {
+      IQueryable<DbRubric> dbRubrics = _provider.Rubrics.AsQueryable();
+
+      if (filter.IncludeArticles)
+      {
+        dbRubrics = dbRubrics.Include(x => x.Articles);
+      }
+
+      return await dbRubrics
+          .FirstOrDefaultAsync(x => x.Id == filter.RubricId);
+    }
   }
 }
