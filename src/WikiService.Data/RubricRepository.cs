@@ -92,7 +92,9 @@ namespace LT.DigitalOffice.WikiService.Data
 
     private async Task<List<DbRubric>> FindRubricChild(IQueryable<DbRubric> dbRubrics)
     {
-      foreach (DbRubric topRubric in dbRubrics.ToList())//todo - to rewrite the next foreach with Any()
+      List<DbRubric> result = await dbRubrics.ToListAsync();
+      
+      foreach (DbRubric topRubric in result)//todo - to rewrite the next foreach with Any()
       {
         foreach (DbRubric rubric in _provider.Rubrics.AsEnumerable())
         {
@@ -116,7 +118,7 @@ namespace LT.DigitalOffice.WikiService.Data
         }
       }
 
-      return await dbRubrics.ToListAsync();
+      return result;
     }
   }
 }
