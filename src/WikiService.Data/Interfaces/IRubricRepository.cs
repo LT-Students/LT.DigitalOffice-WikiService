@@ -17,5 +17,9 @@ namespace LT.DigitalOffice.WikiService.Data.Interfaces
     Task<bool> DoesRubricNameExistAsync(Guid? rubricParentId, string nameRubric);
 
     Task<(List<DbRubric> dbRubric, int totalCount)> FindAsync(FindRubricFilter filter);
+
+    Task<List<DbRubric>> GetSubRubricsAsync(GetRubricFilter filter);
+
+    Task<DbRubric> GetAsync(GetRubricFilter filter);
   }
 }
