@@ -1,4 +1,8 @@
-﻿using LT.DigitalOffice.Kernel.Extensions;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.WikiService.Data.Interfaces;
 using LT.DigitalOffice.WikiService.Data.Provider;
 using LT.DigitalOffice.WikiService.Models.Db;
@@ -39,6 +43,12 @@ namespace LT.DigitalOffice.WikiService.Data
       await _provider.SaveAsync();
 
       return dbArticle.Id;
+    }
+
+    public async Task<DbArticle> GetAsync(Guid articleId)
+    {  
+      return await _provider.Articles.Include(a => a.Files)
+        .FirstOrDefaultAsync(article => article.Id == articleId);
     }
 
     public async Task<bool> EditAsync(Guid articleId, JsonPatchDocument<DbArticle> request)

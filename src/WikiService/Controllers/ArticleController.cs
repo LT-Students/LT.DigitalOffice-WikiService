@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Threading.Tasks;
-using LT.DigitalOffice.Kernel.Responses;
 using Microsoft.AspNetCore.Mvc;
+using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.WikiService.Business.Commands.Article.Interfaces;
 using LT.DigitalOffice.WikiService.Models.Dto.Requests.Article;
+using LT.DigitalOffice.WikiService.Models.Dto.Responses.Article;
 using Microsoft.AspNetCore.JsonPatch;
 
 namespace LT.DigitalOffice.WikiService.Controllers
@@ -18,6 +19,14 @@ namespace LT.DigitalOffice.WikiService.Controllers
       [FromBody] CreateArticleRequest request)
     {
       return await command.ExecuteAsync(request);
+    }
+
+    [HttpGet("get")]
+    public async Task<OperationResultResponse<ArticleResponse>> GetAsync(
+      [FromServices] IGetArticleCommand command,
+      [FromQuery] Guid articleId)
+    {
+      return await command.ExecuteAsync(articleId);
     }
 
     [HttpPatch("edit")]
