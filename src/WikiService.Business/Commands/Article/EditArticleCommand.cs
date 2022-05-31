@@ -14,6 +14,9 @@ using Microsoft.AspNetCore.JsonPatch.Operations;
 using LT.DigitalOffice.WikiService.Business.Commands.Article.Interfaces;
 using LT.DigitalOffice.WikiService.Data.Interfaces;
 using LT.DigitalOffice.WikiService.Validation.Article.Interfaces;
+using LT.DigitalOffice.WikiService.Mappers.Models.Interfaces;
+using LT.DigitalOffice.WikiService.Models.Dto.Requests.Article;
+using LT.DigitalOffice.WikiService.Models.Db;
 
 namespace LT.DigitalOffice.WikiService.Business.Commands.Article
 {
@@ -41,19 +44,24 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Article
 
     public async Task<OperationResultResponse<bool>> ExecuteAsync(Guid articleId, JsonPatchDocument<EditArticleRequest> patch)
     {
-      /*if (!(await _accessValidator.HasRightsAsync(Rights.AddEditRemoveWiki)))
+      if (!await _accessValidator.HasRightsAsync(Rights.AddEditRemoveWiki))
       {
         return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.Forbidden);
       }
 
-      if (!_validator.ValidateCustom(patch, out List<string> errors))
+      DbArticle article = await _repository.GetAsync(articleId);
+
+      if (!_validator.ValidateCustom((article, patch), out List<string> errors)) //validateasync - ?
       {
         return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.BadRequest, errors);
-      }*/
-    }
+      }
 
+      OperationResultResponse<bool> response = new();
+
+      response.Body = await _repository.EditAsync(articleId, _mapper.Map(patch));
+      response.Status = response.Body ? OperationResultStatusType.FullSuccess : OperationResultStatusType.Failed;
+
+      return response;
+    }
   }
 }
-
-
-
