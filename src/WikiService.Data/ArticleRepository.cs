@@ -1,9 +1,10 @@
-﻿using LT.DigitalOffice.WikiService.Data.Interfaces;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using LT.DigitalOffice.WikiService.Data.Interfaces;
 using LT.DigitalOffice.WikiService.Data.Provider;
 using LT.DigitalOffice.WikiService.Models.Db;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Threading.Tasks;
 
 namespace LT.DigitalOffice.WikiService.Data
 {
@@ -33,6 +34,12 @@ namespace LT.DigitalOffice.WikiService.Data
       await _provider.SaveAsync();
 
       return dbArticle.Id;
+    }
+
+    public async Task<DbArticle> GetAsync(Guid articleId)
+    {  
+      return await _provider.Articles.Include(a => a.Files)
+        .FirstOrDefaultAsync(article => article.Id == articleId);
     }
   }
 }
