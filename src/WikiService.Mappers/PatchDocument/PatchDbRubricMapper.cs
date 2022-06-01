@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using LT.DigitalOffice.WikiService.Mappers.PatchDocument.Interfaces;
+﻿using LT.DigitalOffice.WikiService.Mappers.PatchDocument.Interfaces;
 using LT.DigitalOffice.WikiService.Models.Db;
 using LT.DigitalOffice.WikiService.Models.Dto.Requests.Rubric;
 using Microsoft.AspNetCore.JsonPatch;

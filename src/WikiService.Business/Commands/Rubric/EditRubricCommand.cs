@@ -6,7 +6,6 @@ using FluentValidation.Results;
 using LT.DigitalOffice.Kernel.BrokerSupport.AccessValidatorEngine.Interfaces;
 using LT.DigitalOffice.Kernel.Constants;
 using LT.DigitalOffice.Kernel.Enums;
-using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.Helpers.Interfaces;
 using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.WikiService.Business.Commands.Rubric.Interfaces;
@@ -47,8 +46,6 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric
     public async Task<OperationResultResponse<bool>> ExecuteAsync(Guid rubricId, JsonPatchDocument<EditRubricRequest> request)
     {
       OperationResultResponse<bool> response = new();
-
-      Guid userId = _httpContextAccessor.HttpContext.GetUserId();
 
       if (!await _accessValidator.HasRightsAsync(Rights.AddEditRemoveWiki))
       {

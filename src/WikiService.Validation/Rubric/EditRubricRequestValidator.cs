@@ -64,7 +64,7 @@ namespace LT.DigitalOffice.WikiService.Validation.Rubric
       AddFailureForPropertyIf(
        nameof(EditRubricRequest.IsActive),
        x => x == OperationType.Replace,
-       new Dictionary<Func<Operation<EditRubricRequest>, bool>, string>
+       new()
        {
          {
            x => bool.TryParse(x.value?.ToString(), out bool _), "Incorrect rubric is active format"
@@ -78,7 +78,7 @@ namespace LT.DigitalOffice.WikiService.Validation.Rubric
       await AddFailureForPropertyIfAsync(
         nameof(EditRubricRequest.ParentId),
         x => x == OperationType.Replace,
-        new Dictionary<Func<Operation<EditRubricRequest>, Task<bool>>, string>
+        new()
         {
           {
             x => Task.FromResult(
