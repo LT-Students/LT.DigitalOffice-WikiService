@@ -44,6 +44,37 @@ namespace LT.DigitalOffice.WikiService.Data
 
       return dbRubric;
     }
+    
+    private async Task<List<DbRubric>> FindRubricChild(IQueryable<DbRubric> dbRubrics)
+    {
+      List<DbRubric> result = await dbRubrics.ToListAsync();
+      
+      foreach (DbRubric topRubric in result)//todo - to rewrite the next foreach with Any()
+      {
+        foreach (DbRubric rubric in _provider.Rubrics.AsEnumerable())
+        {
+          if (rubric.ParentId == topRubric.Id)
+          {
+            topRubric.HasChild = true;
+            break;
+          }
+        }
+
+        if (!topRubric.HasChild)
+        {
+          foreach (DbArticle article in _provider.Articles.AsEnumerable())
+          {
+            if (article.RubricId == topRubric.Id)
+            {
+              topRubric.HasChild = true;
+              break;
+            }
+          }
+        }
+      }
+
+      return result;
+    }
 
     public RubricRepository(
       IDataProvider provider)
@@ -88,37 +119,6 @@ namespace LT.DigitalOffice.WikiService.Data
     public async Task<bool> DoesRubricNameExistAsync(Guid? rubricParentId, string nameRubric)
     {
       return await _provider.Rubrics.AnyAsync(p => p.ParentId == rubricParentId && p.Name == nameRubric);
-    }
-
-    private async Task<List<DbRubric>> FindRubricChild(IQueryable<DbRubric> dbRubrics)
-    {
-      List<DbRubric> result = await dbRubrics.ToListAsync();
-      
-      foreach (DbRubric topRubric in result)//todo - to rewrite the next foreach with Any()
-      {
-        foreach (DbRubric rubric in _provider.Rubrics.AsEnumerable())
-        {
-          if (rubric.ParentId == topRubric.Id)
-          {
-            topRubric.HasChild = true;
-            break;
-          }
-        }
-
-        if (!topRubric.HasChild)
-        {
-          foreach (DbArticle article in _provider.Articles.AsEnumerable())
-          {
-            if (article.RubricId == topRubric.Id)
-            {
-              topRubric.HasChild = true;
-              break;
-            }
-          }
-        }
-      }
-
-      return result;
     }
   }
 }
