@@ -10,5 +10,6 @@ namespace LT.DigitalOffice.WikiService.Data.Interfaces
   {
     Task<Guid?> CreateAsync(DbArticle dbArticle);
     Task<bool> DoesSameNameExistAsync(Guid rubricId, string articleName);
+    Task<bool> DoesExistAsync(Guid articleId);
   }
 }

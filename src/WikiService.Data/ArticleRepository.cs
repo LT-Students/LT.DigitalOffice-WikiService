@@ -34,5 +34,10 @@ namespace LT.DigitalOffice.WikiService.Data
 
       return dbArticle.Id;
     }
+
+    public async Task<bool> DoesExistAsync(Guid articleId)
+    {
+      return await _provider.Articles.AnyAsync(x => x.Id == articleId);
+    }
   }
 }

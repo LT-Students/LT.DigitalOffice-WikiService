@@ -137,7 +137,7 @@ namespace LT.DigitalOffice.WikiService
 
       using var context = serviceScope.ServiceProvider.GetService<WikiServiceDbContext>();
 
-      context.Database.Migrate();
+      //context.Database.Migrate();
     }
     private void ConfigureMassTransit(IServiceCollection services)
     {
