@@ -2,12 +2,13 @@
 using FluentValidation.Validators;
 using LT.DigitalOffice.Kernel.Validators;
 using LT.DigitalOffice.WikiService.Data.Interfaces;
+using LT.DigitalOffice.WikiService.Models.Db;
 using LT.DigitalOffice.WikiService.Models.Dto.Requests.Rubric;
 using LT.DigitalOffice.WikiService.Validation.Rubric.Interfaces;
-using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.JsonPatch.Operations;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace LT.DigitalOffice.WikiService.Validation.Rubric
@@ -16,7 +17,9 @@ namespace LT.DigitalOffice.WikiService.Validation.Rubric
   {
     private readonly IRubricRepository _rubricRepository;
 
-    private async Task HandleInternalPropertyValidationAsync(Guid rubricId, Operation<EditRubricRequest> requestedOperation, CustomContext context)
+    private async Task HandleInternalPropertyValidationAsync(
+      Operation<EditRubricRequest> requestedOperation,
+      CustomContext context)
     {
       Context = context;
       RequestedOperation = requestedOperation;
@@ -42,28 +45,17 @@ namespace LT.DigitalOffice.WikiService.Validation.Rubric
       AddFailureForPropertyIf(
         nameof(EditRubricRequest.Name),
         x => x == OperationType.Replace,
-        new Dictionary<Func<Operation<EditRubricRequest>, bool>, string>
-        {
-          { x => !string.IsNullOrEmpty(x.value?.ToString().Trim()), "Name must not be empty." },
-          { x => x.value.ToString().Trim().Length <= 150, "Name is too long." },
-        }, CascadeMode.Stop);
-
-      /*await AddFailureForPropertyIfAsync(
-        nameof(EditRubricRequest.Name),
-        x => x == OperationType.Replace,
-        new Dictionary<Func<Operation<EditRubricRequest>, Task <bool>>, string>
+        new()
         {
           {
-            async (x) =>
-            {
-              if (!Guid.TryParse(x.value?.ToString(), out Guid parentId))
-              {
-                return false;
-              }
-
-              !await _rubricRepository.DoesRubricNameExistAsync(rubricId, name), "The rubric name already exist.") }
-        }, CascadeMode.Stop);*/
-
+            x => !string.IsNullOrWhiteSpace(x.value?.ToString()),
+            "Name must not be empty."
+          },
+          {
+            x => x.value.ToString().Trim().Length <= 150,
+            "Name is too long."
+          }
+        }, CascadeMode.Stop);
 
       #endregion
 
@@ -83,24 +75,18 @@ namespace LT.DigitalOffice.WikiService.Validation.Rubric
 
       #region ParentId
 
-      AddFailureForPropertyIf(
-        nameof(EditRubricRequest.ParentId),
-        x => x == OperationType.Replace,
-        new Dictionary<Func<Operation<EditRubricRequest>, bool>, string>
-        {
-          {
-            x => string.IsNullOrEmpty(
-              x.value?.ToString())? true :
-            Guid.TryParse(x.value.ToString(), out Guid result),
-            "Incorrect format of ParentId."
-          }
-        }, CascadeMode.Stop);
-
       await AddFailureForPropertyIfAsync(
         nameof(EditRubricRequest.ParentId),
         x => x == OperationType.Replace,
         new Dictionary<Func<Operation<EditRubricRequest>, Task<bool>>, string>
         {
+          {
+            x => Task.FromResult(
+              string.IsNullOrEmpty(x.value?.ToString())
+              ? true
+              : Guid.TryParse(x.value.ToString(), out Guid result)),
+            "Incorrect format of ParentId."
+          },
           {
             async (x) =>
             {
@@ -129,8 +115,81 @@ namespace LT.DigitalOffice.WikiService.Validation.Rubric
       _rubricRepository = rubricRepository;
 
       RuleForEach(x => x.Item2.Operations)
-        .CustomAsync(async (x, context, _) => await HandleInternalPropertyValidationAsync(rubricId, x, context));
+        .CustomAsync(async (x, context, _) => await HandleInternalPropertyValidationAsync(x, context));
+
+      When(x => x.Item2.Operations.Any(o => o.path.EndsWith(nameof(EditRubricRequest.ParentId), StringComparison.OrdinalIgnoreCase)) == true
+        && x.Item2.Operations.Any(o => o.path.EndsWith(nameof(EditRubricRequest.Name), StringComparison.OrdinalIgnoreCase)) == true,
+        () =>
+        {
+          RuleFor(x => x)
+            .MustAsync(async (x, _) =>
+            {
+              string opValue = x.Item2.Operations.FirstOrDefault(
+                  o => o.path.EndsWith(nameof(EditRubricRequest.ParentId), StringComparison.OrdinalIgnoreCase)).value?.ToString();
+
+              if (opValue is null)
+              {
+                return !await _rubricRepository.DoesRubricNameExistAsync(
+                  null,
+                  x.Item2.Operations.FirstOrDefault(
+                    o => o.path.EndsWith(nameof(EditRubricRequest.Name), StringComparison.OrdinalIgnoreCase)).value?.ToString());
+              }
+              else if (Guid.TryParse(opValue, out Guid parentId))
+              {
+                return !await _rubricRepository.DoesRubricNameExistAsync(
+                  parentId,
+                  x.Item2.Operations.FirstOrDefault(
+                    o => o.path.EndsWith(nameof(EditRubricRequest.Name), StringComparison.OrdinalIgnoreCase)).value?.ToString());
+              }
+              
+              return false;
+            })
+            .WithMessage("Name already exists.");
+        });
+
+      When(x => !x.Item2.Operations.Any(o => o.path.EndsWith(nameof(EditRubricRequest.Name), StringComparison.OrdinalIgnoreCase))
+        && x.Item2.Operations.Any(o => o.path.EndsWith(nameof(EditRubricRequest.ParentId), StringComparison.OrdinalIgnoreCase)),
+        () =>
+        {
+          RuleFor(x => x)
+            .MustAsync(async (x, _) =>
+            {
+              DbRubric oldRubric = await _rubricRepository.GetAsync(x.Item1);
+              string rubricName = oldRubric.Name;
+              string opValue = x.Item2.Operations.FirstOrDefault(
+                  o => o.path.EndsWith(nameof(EditRubricRequest.ParentId), StringComparison.OrdinalIgnoreCase)).value?.ToString();
+
+              if (opValue is null)
+              {
+                return !await _rubricRepository.DoesRubricNameExistAsync(null, rubricName);
+              }
+              else if (Guid.TryParse(opValue, out Guid parentId))
+              {
+                return !await _rubricRepository.DoesRubricNameExistAsync(parentId, rubricName);
+              }
+              
+              return false;
+            })
+            .WithMessage("Name already exists.");
+        });
+
+      When(x => !x.Item2.Operations.Any(o => o.path.EndsWith(nameof(EditRubricRequest.ParentId), StringComparison.OrdinalIgnoreCase))
+        && x.Item2.Operations.Any(o => o.path.EndsWith(nameof(EditRubricRequest.Name), StringComparison.OrdinalIgnoreCase)),
+        () =>
+        {
+          RuleFor(x => x)
+            .MustAsync(async (x, _) =>
+            {
+              DbRubric oldRubric = await _rubricRepository.GetAsync(x.Item1);
+              Guid? rubricParentId = oldRubric.ParentId;
+              
+              return !await _rubricRepository.DoesRubricNameExistAsync(
+                rubricParentId,
+                x.Item2.Operations.FirstOrDefault(
+                  o => o.path.EndsWith(nameof(EditRubricRequest.Name), StringComparison.OrdinalIgnoreCase)).value?.ToString());
+            })
+            .WithMessage("Name already exists.");
+        });
     }
   }
-
 }

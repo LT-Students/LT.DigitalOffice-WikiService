@@ -13,6 +13,8 @@ namespace LT.DigitalOffice.WikiService.Data.Interfaces
   {
     Task<Guid?> CreateAsync(DbRubric dbRubric);
 
+    Task<DbRubric> GetAsync(Guid rubricId);
+
     Task<bool> EditAsync(Guid projectId, JsonPatchDocument<DbRubric> request);
 
     Task<bool> DoesExistAsync(Guid rubricId);

@@ -1,3 +1,4 @@
+using HealthChecks.UI.Client;
 using LT.DigitalOffice.Kernel.BrokerSupport.Configurations;
 using LT.DigitalOffice.Kernel.BrokerSupport.Extensions;
 using LT.DigitalOffice.Kernel.BrokerSupport.Helpers;
@@ -6,22 +7,21 @@ using LT.DigitalOffice.Kernel.Configurations;
 using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.Helpers;
 using LT.DigitalOffice.Kernel.Middlewares.ApiInformation;
+using LT.DigitalOffice.WikiService.Data.Provider.MsSql.Ef;
+using LT.DigitalOffice.WikiService.Models.Dto.Configurations;
 using MassTransit;
-using MassTransit.RabbitMqTransport;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Logging;
 using Serilog;
 using System;
-using LT.DigitalOffice.WikiService.Models.Dto.Configurations;
-using LT.DigitalOffice.WikiService.Data.Provider.MsSql.Ef;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Diagnostics.HealthChecks;
-using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
-using HealthChecks.UI.Client;
+using System.Text.Json.Serialization;
 
 namespace LT.DigitalOffice.WikiService
 {
@@ -97,7 +97,12 @@ namespace LT.DigitalOffice.WikiService
 
       services.AddMemoryCache();
       services.AddBusinessObjects();
-      services.AddControllers();
+      services.AddControllers()
+        .AddJsonOptions(options =>
+        {
+          options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        })
+        .AddNewtonsoftJson();
 
       ConfigureMassTransit(services);
     }

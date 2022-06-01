@@ -55,7 +55,7 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric
         return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.Forbidden);
       }
 
-      ValidationResult validationResult = await _validator.ValidateAsync((request, rubricId));
+      ValidationResult validationResult = await _validator.ValidateAsync((rubricId, request));
 
       if (!validationResult.IsValid)
       {
@@ -66,6 +66,7 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric
       response.Body = await _rubricRepository.EditAsync(rubricId, _mapper.Map(request));
 
       response.Status = OperationResultStatusType.FullSuccess;
+
       if (!response.Body)
       {
         _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;

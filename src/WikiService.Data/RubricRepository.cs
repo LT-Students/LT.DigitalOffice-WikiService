@@ -115,6 +115,11 @@ namespace LT.DigitalOffice.WikiService.Data
       return dbRubric.Id;
     }
 
+    public async Task<DbRubric> GetAsync(Guid rubricId)
+    {
+      return await _provider.Rubrics.FirstOrDefaultAsync(x => x.Id == rubricId);
+    }
+
     public async Task<bool> EditAsync(Guid rubricId, JsonPatchDocument<DbRubric> request)
     {
       DbRubric dbRubric = await _provider.Rubrics.FirstOrDefaultAsync(p => p.Id == rubricId);
@@ -140,7 +145,7 @@ namespace LT.DigitalOffice.WikiService.Data
 
     public async Task<bool> DoesRubricNameExistAsync(Guid? rubricParentId, string nameRubric)
     {
-      return await _provider.Rubrics.AnyAsync(p => p.ParentId == rubricParentId && p.Name == nameRubric);
+      return await _provider.Rubrics.AnyAsync(p => p.ParentId == rubricParentId && p.Name.ToUpper() == nameRubric.ToUpper());
     }
   }
 }

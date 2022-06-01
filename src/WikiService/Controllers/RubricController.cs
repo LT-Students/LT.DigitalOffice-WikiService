@@ -1,13 +1,12 @@
-﻿using System.Threading.Tasks;
-using LT.DigitalOffice.Kernel.Responses;
-using LT.DigitalOffice.WikiService.Models.Dto.Requests;
+﻿using LT.DigitalOffice.Kernel.Responses;
+using LT.DigitalOffice.WikiService.Business.Commands.Rubric.Interfaces;
 using LT.DigitalOffice.WikiService.Models.Dto.Models;
+using LT.DigitalOffice.WikiService.Models.Dto.Requests.Rubric;
 using LT.DigitalOffice.WikiService.Models.Dto.Requests.Rubric.Filters;
-using LT.DigitalOffice.WikiService.Business.Commands.Rubric.Interfaces; 
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using Microsoft.AspNetCore.JsonPatch;
-using LT.DigitalOffice.WikiService.Models.Dto.Requests.Rubric;
+using System.Threading.Tasks;
 
 namespace LT.DigitalOffice.WikiService.Controllers
 {
