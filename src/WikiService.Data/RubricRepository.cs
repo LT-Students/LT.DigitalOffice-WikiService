@@ -145,7 +145,7 @@ namespace LT.DigitalOffice.WikiService.Data
 
     public async Task<bool> DoesRubricNameExistAsync(Guid? rubricParentId, string nameRubric)
     {
-      return await _provider.Rubrics.AnyAsync(p => p.ParentId == rubricParentId && p.Name.ToUpper() == nameRubric.ToUpper());
+      return await _provider.Rubrics.AnyAsync(p => p.ParentId == rubricParentId && p.Name.ToLower() == nameRubric.ToLower());
     }
   }
 }
