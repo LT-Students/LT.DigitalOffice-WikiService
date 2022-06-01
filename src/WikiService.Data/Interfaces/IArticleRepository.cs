@@ -3,8 +3,6 @@ using System.Threading.Tasks;
 using LT.DigitalOffice.Kernel.Attributes;
 using LT.DigitalOffice.WikiService.Models.Db;
 using Microsoft.AspNetCore.JsonPatch;
-using System;
-using System.Threading.Tasks;
 
 namespace LT.DigitalOffice.WikiService.Data.Interfaces
 {

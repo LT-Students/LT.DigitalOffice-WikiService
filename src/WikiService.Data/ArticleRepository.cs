@@ -1,8 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using LT.DigitalOffice.Kernel.Extensions;
+﻿using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.WikiService.Data.Interfaces;
 using LT.DigitalOffice.WikiService.Data.Provider;
 using LT.DigitalOffice.WikiService.Models.Db;
@@ -27,7 +23,7 @@ namespace LT.DigitalOffice.WikiService.Data
       _httpContextAccessor = httpContextAccessor;
     }
 
-  public async Task<bool> DoesSameNameExistAsync(Guid rubricId, string articleName)
+    public async Task<bool> DoesSameNameExistAsync(Guid rubricId, string articleName)
     {
       return await _provider.Articles.AnyAsync(a => a.RubricId == rubricId && a.Name == articleName);
     }
@@ -46,7 +42,7 @@ namespace LT.DigitalOffice.WikiService.Data
     }
 
     public async Task<DbArticle> GetAsync(Guid articleId)
-    {  
+    {
       return await _provider.Articles.Include(a => a.Files)
         .FirstOrDefaultAsync(article => article.Id == articleId);
     }

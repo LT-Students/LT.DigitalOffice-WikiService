@@ -1,22 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
+﻿using FluentValidation.Results;
 using LT.DigitalOffice.Kernel.BrokerSupport.AccessValidatorEngine.Interfaces;
 using LT.DigitalOffice.Kernel.Constants;
 using LT.DigitalOffice.Kernel.Enums;
-using LT.DigitalOffice.Kernel.FluentValidationExtensions;
 using LT.DigitalOffice.Kernel.Helpers.Interfaces;
 using LT.DigitalOffice.Kernel.Responses;
-using Microsoft.AspNetCore.JsonPatch;
-using Microsoft.AspNetCore.JsonPatch.Operations;
 using LT.DigitalOffice.WikiService.Business.Commands.Article.Interfaces;
 using LT.DigitalOffice.WikiService.Data.Interfaces;
-using LT.DigitalOffice.WikiService.Validation.Article.Interfaces;
 using LT.DigitalOffice.WikiService.Mappers.Models.Interfaces;
-using LT.DigitalOffice.WikiService.Models.Dto.Requests.Article;
 using LT.DigitalOffice.WikiService.Models.Db;
+using LT.DigitalOffice.WikiService.Models.Dto.Requests.Article;
+using LT.DigitalOffice.WikiService.Validation.Article.Interfaces;
+using Microsoft.AspNetCore.JsonPatch;
+using System;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
 
 namespace LT.DigitalOffice.WikiService.Business.Commands.Article
 {
@@ -50,10 +48,13 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Article
       }
 
       DbArticle article = await _repository.GetAsync(articleId);
+      ValidationResult validationResult = await _validator.ValidateAsync((article, patch));
 
-      if (!_validator.ValidateCustom((article, patch), out List<string> errors)) //validateasync - ?
+      if (!validationResult.IsValid)
       {
-        return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.BadRequest, errors);
+        return _responseCreator.CreateFailureResponse<bool>
+          (HttpStatusCode.BadRequest,
+          validationResult.Errors.Select(x => x.ErrorMessage).ToList());
       }
 
       OperationResultResponse<bool> response = new();
