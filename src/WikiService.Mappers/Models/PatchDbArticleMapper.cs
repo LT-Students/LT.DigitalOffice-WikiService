@@ -15,7 +15,7 @@ namespace LT.DigitalOffice.WikiService.Mappers.Models
         return null;
       }
 
-      var result = new JsonPatchDocument<DbArticle>();
+      JsonPatchDocument<DbArticle> result = new JsonPatchDocument<DbArticle>();
 
       foreach (var item in request.Operations)
       {
