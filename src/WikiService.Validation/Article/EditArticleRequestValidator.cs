@@ -44,8 +44,8 @@ namespace LT.DigitalOffice.WikiService.Validation.Article
         x => x == OperationType.Replace,
         new()
         {
-          { x => !string.IsNullOrEmpty(x.value?.ToString()), "Name can't be empty." },
-          { x => x.value.ToString().Length < 151, "Max lenght of article name is 150 symbols." },
+          { x => !string.IsNullOrEmpty(x.value?.ToString().Trim()), "Name can't be empty." },
+          { x => x.value?.ToString().Trim().Length < 151, "Max lenght of article name is 150 symbols." },
         },
         CascadeMode.Stop);
 
@@ -57,7 +57,7 @@ namespace LT.DigitalOffice.WikiService.Validation.Article
         x => x == OperationType.Replace,
         new()
         {
-          { x => !string.IsNullOrEmpty(x.value?.ToString()), "Article content can't be empty." }
+          { x => !string.IsNullOrEmpty(x.value?.ToString().Trim()), "Article content can't be empty." }
         });
       #endregion
 
@@ -77,7 +77,7 @@ namespace LT.DigitalOffice.WikiService.Validation.Article
         x => x == OperationType.Replace,
         new()
         {
-          { x => Guid.TryParse(x.value.ToString(), out Guid _), "Incorrect format of RubricId." },
+          { x => Guid.TryParse(x.value?.ToString(), out Guid _), "Incorrect format of RubricId." },
         });
 
       await AddFailureForPropertyIfAsync(
@@ -87,7 +87,7 @@ namespace LT.DigitalOffice.WikiService.Validation.Article
         {
           {
             async x => await _rubricRepository.DoesExistAsync(
-              Guid.TryParse(x.value.ToString(), out Guid _rubricId) ? _rubricId : default
+              Guid.TryParse(x.value?.ToString(), out Guid _rubricId) ? _rubricId : default
               ),
             "This rubric id doesn't exist."
           }
@@ -100,31 +100,32 @@ namespace LT.DigitalOffice.WikiService.Validation.Article
       _articleRepository = articleRepository;
       _rubricRepository = rubricRepository;
 
-      When(x => x.Item2.Operations
-      .Any(o => (o.path.EndsWith(nameof(EditArticleRequest.RubricId))) || (o.path.EndsWith(nameof(EditArticleRequest.Name)))),
-       () =>
-       {
-         RuleFor(x => x)
-          .MustAsync(async (x, _) =>
-          {
-            Guid _currentRubricId = x.Item1.RubricId;
-            string _currentArticleName = x.Item1.Name;
-
-            foreach (Operation<EditArticleRequest> item in x.Item2.Operations)
-            {
-              _currentRubricId = item.path.EndsWith(nameof(EditArticleRequest.RubricId))
-                ? Guid.TryParse(item.value.ToString(), out Guid _rubricIdParseResult) ? _rubricIdParseResult : _currentRubricId
-                : _currentRubricId;
-
-              _currentArticleName = item.path.EndsWith(nameof(EditArticleRequest.Name)) ? item.value.ToString() : _currentArticleName;
-            }
-            return !await _articleRepository.DoesSameNameExistAsync(_currentRubricId, _currentArticleName);
-          })
-          .WithMessage("That article name already exists in this rubric.");
-       });
-
       RuleForEach(x => x.Item2.Operations)
-      .CustomAsync(async (x, context, _) => await HandleInternalPropertyValidationAsync(x, context));
+        .CustomAsync(async (x, context, _) => await HandleInternalPropertyValidationAsync(x, context));
+
+      When(x => x.Item2.Operations.Any(o =>
+        (o.path.EndsWith(nameof(EditArticleRequest.RubricId), StringComparison.OrdinalIgnoreCase))
+        || (o.path.EndsWith(nameof(EditArticleRequest.Name), StringComparison.OrdinalIgnoreCase))),
+        () =>
+        {
+          RuleFor(x => x)
+           .MustAsync(async (x, _) =>
+           {
+             Guid _currentRubricId = x.Item1.RubricId;
+             string _currentArticleName = x.Item1.Name;
+             
+             foreach (Operation<EditArticleRequest> item in x.Item2.Operations)
+             {
+               _currentRubricId = item.path.EndsWith(nameof(EditArticleRequest.RubricId))
+                 ? Guid.TryParse(item.value?.ToString(), out Guid _rubricIdParseResult) ? _rubricIdParseResult : _currentRubricId
+                 : _currentRubricId;
+
+               _currentArticleName = item.path.EndsWith(nameof(EditArticleRequest.Name)) ? item.value?.ToString() : _currentArticleName;
+             }
+             return !await _articleRepository.DoesSameNameExistAsync(_currentRubricId, _currentArticleName);
+           })
+           .WithMessage("That article name already exists in this rubric.");
+        });
     }
   }
 }
