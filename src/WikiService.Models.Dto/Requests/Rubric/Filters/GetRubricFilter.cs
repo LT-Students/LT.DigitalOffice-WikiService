@@ -4,15 +4,15 @@ using System;
 
 namespace LT.DigitalOffice.WikiService.Models.Dto.Requests.Rubric.Filters
 {
-  public record GetRubricFilter : BaseFindFilter
+  public record GetRubricFilter
   {
     [FromQuery(Name = "rubricId")]
-    public Guid? RubricId { get; set; }
+    public Guid RubricId { get; set; }
 
     [FromQuery(Name = "includeSubRubrics")]
-    public bool IncludeSubRubrics { get; set; }
+    public bool IncludeSubRubrics { get; set; } = false;
 
     [FromQuery(Name = "includeArticles")]
-    public bool IncludeArticles { get; set; }
+    public bool IncludeArticles { get; set; } = false;
   }
 }

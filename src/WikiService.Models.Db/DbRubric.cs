@@ -18,9 +18,9 @@ namespace LT.DigitalOffice.WikiService.Models.Db
     public DateTime CreatedAtUtc { get; set; }
     public Guid? ModifiedBy { get; set; }
     public DateTime? ModifiedAtUtc { get; set; }
-
     public ICollection<DbArticle> Articles { get; set; }
-
+    public ICollection<DbRubric> ParentIds { get; set; }
+    public DbRubric Parent { get; set; }
     public DbRubric()
     {
       Articles = new HashSet<DbArticle>();
@@ -42,6 +42,12 @@ namespace LT.DigitalOffice.WikiService.Models.Db
         .WithOne(r => r.Rubric);
 
       builder.Ignore(x => x.HasChild);
+
+      builder.Ignore(x => x.ParentIds);
+
+      builder
+        .HasMany(a => a.ParentIds)
+        .WithOne(r => r.Parent);
     }
   }
 }

@@ -8,7 +8,6 @@ using LT.DigitalOffice.WikiService.Models.Db;
 using LT.DigitalOffice.WikiService.Models.Dto.Requests.Rubric.Filters;
 using LT.DigitalOffice.WikiService.Models.Dto.Responses.Rubric;
 using Microsoft.AspNetCore.Http;
-using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -21,7 +20,6 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IResponseCreator _responseCreator;
 
-
     public GetRubricCommand(
       IRubricRepository rubricRepository,
       IRubricResponseMapper rubricResponseMapper,
@@ -33,36 +31,18 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric
       _httpContextAccessor = httpContextAccessor;
       _responseCreator = responseCreator;
     }
+
     public async Task<OperationResultResponse<RubricResponse>> ExecuteAsync(GetRubricFilter filter)
     {
+      DbRubric dbRubric = await _rubricRepository.GetAsync(filter);
+      
       OperationResultResponse<RubricResponse> response = new();
 
-      if (filter is null ||
-        filter.RubricId is null)
-      {
-        return _responseCreator.CreateFailureResponse<RubricResponse>(
-          HttpStatusCode.BadRequest,
-          new List<string> { "You must specify 'rubricId'." });
-      }
-
-      List<DbRubric> subRubrics = await _rubricRepository.GetSubRubricsAsync(filter);
-
-      DbRubric dbRubric = await _rubricRepository.GetAsync(filter);
-
-      response.Body = _rubricResponseMapper.Map(
-        dbRubric, subRubrics);
-
-      response.Status = OperationResultStatusType.FullSuccess;
-
-      if (response.Body == null)
-      {
-        _httpContextAccessor.HttpContext.Response.StatusCode = (int)System.Net.HttpStatusCode.NotFound;
-
-        response.Status = OperationResultStatusType.Failed;
-        response.Errors.Add("Rubric was not found.");
-      }
-
-      return response;
+      response.Body = _rubricResponseMapper.Map(dbRubric);
+     
+      return response.Body == null
+        ? _responseCreator.CreateFailureResponse<RubricResponse>(HttpStatusCode.NotFound)
+:       response;
     }
   }
 }

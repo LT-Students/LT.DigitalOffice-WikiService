@@ -113,30 +113,31 @@ namespace LT.DigitalOffice.WikiService.Data
       return await _provider.Rubrics.AnyAsync(p => p.ParentId == rubricParentId && p.Name == nameRubric);
     }
 
-    public async Task<List<DbRubric>> GetSubRubricsAsync(GetRubricFilter filter)
+    public async Task<DbRubric> GetAsync(GetRubricFilter filter)
     {
-      IQueryable<DbRubric> dbRubrics = _provider.Rubrics.AsQueryable();
+     IQueryable<DbRubric> dbRubric = _provider.Rubrics.AsQueryable();
+     IQueryable<DbRubric> subRubrics = _provider.Rubrics.AsQueryable();
 
       if (filter.IncludeSubRubrics)
       {
-        return await dbRubrics
-          .Where(x => x.ParentId == filter.RubricId)
-          .ToListAsync();
+        subRubrics = subRubrics
+          .Where(x => x.ParentId == filter.RubricId);
+           
+        foreach (DbRubric subRubric in subRubrics.ToList())
+         {
+           if (_provider.Rubrics.Any(x => x.ParentId == subRubric.Id))
+           {
+             subRubric.HasChild = true;
+           }
+         }
       }
-
-      return null;
-    }
-
-    public async Task<DbRubric> GetAsync(GetRubricFilter filter)
-    {
-      IQueryable<DbRubric> dbRubrics = _provider.Rubrics.AsQueryable();
 
       if (filter.IncludeArticles)
       {
-        dbRubrics = dbRubrics.Include(x => x.Articles);
+        dbRubric = dbRubric.Include(x => x.Articles);
       }
 
-      return await dbRubrics
+      return await dbRubric
           .FirstOrDefaultAsync(x => x.Id == filter.RubricId);
     }
   }
