@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace LT.DigitalOffice.WikiService.Data
@@ -41,9 +42,16 @@ namespace LT.DigitalOffice.WikiService.Data
         dbRubric = dbRubric.OrderByDescending(rubric => rubric.CreatedAtUtc);
       }
 
-      foreach (DbRubric topRubric in dbRubric)
+      return dbRubric;
+    }
+    
+    private async Task<List<DbRubric>> FindRubricChild(IQueryable<DbRubric> dbRubrics)
+    {
+      List<DbRubric> result = await dbRubrics.ToListAsync();
+      
+      foreach (DbRubric topRubric in result)//todo - to rewrite the next foreach with Any()
       {
-        foreach (DbRubric rubric in _provider.Rubrics.AsQueryable())
+        foreach (DbRubric rubric in _provider.Rubrics.AsEnumerable())
         {
           if (rubric.ParentId == topRubric.Id)
           {
@@ -54,7 +62,7 @@ namespace LT.DigitalOffice.WikiService.Data
 
         if (!topRubric.HasChild)
         {
-          foreach (DbArticle article in _provider.Articles.AsQueryable())
+          foreach (DbArticle article in _provider.Articles.AsEnumerable())
           {
             if (article.RubricId == topRubric.Id)
             {
@@ -65,7 +73,7 @@ namespace LT.DigitalOffice.WikiService.Data
         }
       }
 
-      return dbRubric;
+      return result;
     }
 
     public RubricRepository(
@@ -86,7 +94,7 @@ namespace LT.DigitalOffice.WikiService.Data
         _provider.Rubrics.AsQueryable().Where(rubric => rubric.ParentId == null));
 
       return (
-        await dbRubric.Skip(filter.SkipCount).Take(filter.TakeCount).ToListAsync(),
+        await FindRubricChild(dbRubric.Skip(filter.SkipCount).Take(filter.TakeCount)),
         await dbRubric.CountAsync());
     }
 
