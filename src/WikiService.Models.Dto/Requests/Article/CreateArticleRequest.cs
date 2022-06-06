@@ -12,6 +12,6 @@ namespace LT.DigitalOffice.WikiService.Models.Dto.Requests.Article
     [Required]
     public string Content { get; set; }
     public Guid RubricId { get; set; }
-    public List<CreateFileRequest> Files { get; set; }
+    public List<FileInfo> Files { get; set; }
   }
 }
