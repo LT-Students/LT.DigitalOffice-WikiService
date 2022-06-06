@@ -59,7 +59,7 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Article
 
       OperationResultResponse<bool> response = new();
 
-      response.Body = await _repository.EditAsync(articleId, _mapper.Map(patch));
+      response.Body = await _repository.EditAsync(article, _mapper.Map(patch));
       response.Status = response.Body ? OperationResultStatusType.FullSuccess : OperationResultStatusType.Failed;
 
       return response;

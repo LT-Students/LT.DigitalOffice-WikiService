@@ -72,14 +72,6 @@ namespace LT.DigitalOffice.WikiService.Validation.Article
       #endregion
 
       #region RubricId
-      AddFailureForPropertyIf(
-        nameof(EditArticleRequest.RubricId),
-        x => x == OperationType.Replace,
-        new()
-        {
-          { x => Guid.TryParse(x.value?.ToString(), out Guid _), "Incorrect format of RubricId." },
-        });
-
       await AddFailureForPropertyIfAsync(
         nameof(EditArticleRequest.RubricId),
         x => x == OperationType.Replace,
@@ -87,8 +79,8 @@ namespace LT.DigitalOffice.WikiService.Validation.Article
         {
           {
             async x => await _rubricRepository.DoesExistAsync(
-              Guid.TryParse(x.value?.ToString(), out Guid _rubricId) ? _rubricId : default
-              ),
+            Guid.TryParse(x.value?.ToString(), out Guid _rubricId) ? _rubricId : default
+            ),
             "This rubric id doesn't exist."
           }
         });
@@ -113,7 +105,7 @@ namespace LT.DigitalOffice.WikiService.Validation.Article
            {
              Guid _currentRubricId = x.Item1.RubricId;
              string _currentArticleName = x.Item1.Name;
-             
+
              foreach (Operation<EditArticleRequest> item in x.Item2.Operations)
              {
                _currentRubricId = item.path.EndsWith(nameof(EditArticleRequest.RubricId))

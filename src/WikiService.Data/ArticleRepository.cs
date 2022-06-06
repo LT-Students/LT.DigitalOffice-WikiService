@@ -47,10 +47,8 @@ namespace LT.DigitalOffice.WikiService.Data
         .FirstOrDefaultAsync(article => article.Id == articleId);
     }
 
-    public async Task<bool> EditAsync(Guid articleId, JsonPatchDocument<DbArticle> request)
+    public async Task<bool> EditAsync(DbArticle dbArticle, JsonPatchDocument<DbArticle> request)
     {
-      DbArticle dbArticle = await _provider.Articles.FirstOrDefaultAsync(x => x.Id == articleId);
-
       if (dbArticle == null || request == null)
       {
         return false;

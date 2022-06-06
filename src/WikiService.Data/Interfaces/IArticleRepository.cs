@@ -12,6 +12,6 @@ namespace LT.DigitalOffice.WikiService.Data.Interfaces
     Task<Guid?> CreateAsync(DbArticle dbArticle);
     Task<bool> DoesSameNameExistAsync(Guid rubricId, string articleName);
     Task<DbArticle> GetAsync(Guid articleId);
-    Task<bool> EditAsync(Guid articleId, JsonPatchDocument<DbArticle> request);
+    Task<bool> EditAsync(DbArticle dbArticle, JsonPatchDocument<DbArticle> request);
   }
 }
