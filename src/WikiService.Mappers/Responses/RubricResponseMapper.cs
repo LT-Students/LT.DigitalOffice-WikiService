@@ -11,7 +11,6 @@ namespace LT.DigitalOffice.WikiService.Mappers.Responses
     public RubricResponse Map(
       DbRubric dbRubric)
     {
-
       if (dbRubric is null)
       {
         return null;
@@ -24,7 +23,7 @@ namespace LT.DigitalOffice.WikiService.Mappers.Responses
         ParentId = dbRubric.ParentId,
         IsActive = dbRubric.IsActive,
 
-        SubRubrics = dbRubric.ParentIds
+        SubRubrics = dbRubric.ChildIds
           ?.Select(x => new RubricInfo
           {
             Id = x.Id,
