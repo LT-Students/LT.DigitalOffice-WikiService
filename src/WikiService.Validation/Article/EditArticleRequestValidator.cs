@@ -114,7 +114,10 @@ namespace LT.DigitalOffice.WikiService.Validation.Article
 
                _currentArticleName = item.path.EndsWith(nameof(EditArticleRequest.Name)) ? item.value?.ToString() : _currentArticleName;
              }
-             return !await _articleRepository.DoesSameNameExistAsync(_currentRubricId, _currentArticleName);
+
+             return (_currentRubricId == x.Item1.RubricId && _currentArticleName == x.Item1.Name)
+             ? true
+             :!await _articleRepository.DoesSameNameExistAsync(_currentRubricId, _currentArticleName);
            })
            .WithMessage("That article name already exists in this rubric.");
         });
