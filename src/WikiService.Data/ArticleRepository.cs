@@ -17,7 +17,7 @@ namespace LT.DigitalOffice.WikiService.Data
 
     public ArticleRepository(
       IDataProvider provider,
-       IHttpContextAccessor httpContextAccessor)
+      IHttpContextAccessor httpContextAccessor)
     {
       _provider = provider;
       _httpContextAccessor = httpContextAccessor;
@@ -49,7 +49,7 @@ namespace LT.DigitalOffice.WikiService.Data
 
     public async Task<bool> EditAsync(DbArticle dbArticle, JsonPatchDocument<DbArticle> request)
     {
-      if (dbArticle == null || request == null)
+      if (dbArticle is null || request is null)
       {
         return false;
       }

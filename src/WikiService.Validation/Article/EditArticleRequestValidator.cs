@@ -17,6 +17,7 @@ namespace LT.DigitalOffice.WikiService.Validation.Article
   {
     private readonly IArticleRepository _articleRepository;
     private readonly IRubricRepository _rubricRepository;
+
     private async Task HandleInternalPropertyValidationAsync(Operation<EditArticleRequest> requestedOperation, CustomContext context)
     {
       RequestedOperation = requestedOperation;
@@ -117,7 +118,7 @@ namespace LT.DigitalOffice.WikiService.Validation.Article
 
              return (_currentRubricId == x.Item1.RubricId && _currentArticleName == x.Item1.Name)
              ? true
-             :!await _articleRepository.DoesSameNameExistAsync(_currentRubricId, _currentArticleName);
+             : !await _articleRepository.DoesSameNameExistAsync(_currentRubricId, _currentArticleName);
            })
            .WithMessage("That article name already exists in this rubric.");
         });

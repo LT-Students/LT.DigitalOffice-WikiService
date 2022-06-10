@@ -10,14 +10,14 @@ namespace LT.DigitalOffice.WikiService.Mappers.Models
   {
     public JsonPatchDocument<DbArticle> Map(JsonPatchDocument<EditArticleRequest> request)
     {
-      if (request == null)
+      if (request is null)
       {
         return null;
       }
 
       JsonPatchDocument<DbArticle> result = new JsonPatchDocument<DbArticle>();
 
-      foreach (var item in request.Operations)
+      foreach (Operation<EditArticleRequest> item in request.Operations)
       {
         result.Operations.Add(new Operation<DbArticle>(item.op, item.path, item.from, item.value));
       }
