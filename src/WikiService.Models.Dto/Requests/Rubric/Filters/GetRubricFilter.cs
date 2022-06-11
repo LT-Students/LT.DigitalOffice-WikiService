@@ -1,5 +1,4 @@
-﻿using LT.DigitalOffice.Kernel.Requests;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using System;
 
 namespace LT.DigitalOffice.WikiService.Models.Dto.Requests.Rubric.Filters
