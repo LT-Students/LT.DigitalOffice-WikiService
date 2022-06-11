@@ -9,7 +9,6 @@ namespace LT.DigitalOffice.WikiService.Mappers.Responses.Interfaces
   [AutoInject]
   public interface IRubricResponseMapper
   {
-    RubricResponse Map(
-      DbRubric dbRubric); 
+    RubricResponse Map(DbRubric dbRubric); 
   }
 }
