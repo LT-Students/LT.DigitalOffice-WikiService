@@ -125,7 +125,7 @@ namespace LT.DigitalOffice.WikiService.Validation.Rubric
              {
                if (item.path.EndsWith(nameof(EditRubricRequest.ParentId), StringComparison.OrdinalIgnoreCase))
                {
-                 if (Guid.TryParse(item.value?.ToString(), out Guid parentId) == true || item.value is null)
+                 if (Guid.TryParse(item.value?.ToString(), out Guid parentId) || item.value is null)
                  {
                    _currentParentId = item.value is null
                     ? null
