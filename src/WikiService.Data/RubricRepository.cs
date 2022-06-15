@@ -120,11 +120,9 @@ namespace LT.DigitalOffice.WikiService.Data
       return await _provider.Rubrics.FirstOrDefaultAsync(x => x.Id == rubricId);
     }
 
-    public async Task<bool> EditAsync(Guid rubricId, JsonPatchDocument<DbRubric> request)
+    public async Task<bool> EditAsync(DbRubric dbRubric, JsonPatchDocument<DbRubric> request)
     {
-      DbRubric dbRubric = await _provider.Rubrics.FirstOrDefaultAsync(p => p.Id == rubricId);
-
-      if (dbRubric == null)
+      if (dbRubric is null || request is null)
       {
         return false;
       }

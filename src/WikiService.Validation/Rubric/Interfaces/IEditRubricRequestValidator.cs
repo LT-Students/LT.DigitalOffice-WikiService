@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using LT.DigitalOffice.Kernel.Attributes;
+using LT.DigitalOffice.WikiService.Models.Db;
 using LT.DigitalOffice.WikiService.Models.Dto.Requests.Rubric;
 using Microsoft.AspNetCore.JsonPatch;
 using System;
@@ -7,7 +8,7 @@ using System;
 namespace LT.DigitalOffice.WikiService.Validation.Rubric.Interfaces
 {
   [AutoInject]
-  public interface IEditRubricRequestValidator : IValidator<(Guid,JsonPatchDocument<EditRubricRequest>)>
+  public interface IEditRubricRequestValidator : IValidator<(DbRubric,JsonPatchDocument<EditRubricRequest>)>
   {
   }
 }

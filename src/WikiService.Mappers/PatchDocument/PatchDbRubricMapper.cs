@@ -15,7 +15,7 @@ namespace LT.DigitalOffice.WikiService.Mappers.PatchDocument
         return null;
       }
 
-      var dbRequest = new JsonPatchDocument<DbRubric>();
+      JsonPatchDocument<DbRubric> dbRequest = new JsonPatchDocument<DbRubric>();
 
       foreach (var item in request.Operations)
       {

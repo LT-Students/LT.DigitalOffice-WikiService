@@ -15,7 +15,7 @@ namespace LT.DigitalOffice.WikiService.Data.Interfaces
 
     Task<DbRubric> GetAsync(Guid rubricId);
 
-    Task<bool> EditAsync(Guid projectId, JsonPatchDocument<DbRubric> request);
+    Task<bool> EditAsync(DbRubric dbRubric, JsonPatchDocument<DbRubric> request);
 
     Task<bool> DoesExistAsync(Guid rubricId);
 

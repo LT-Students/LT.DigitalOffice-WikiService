@@ -11,6 +11,7 @@ using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.WikiService.Business.Commands.Rubric.Interfaces;
 using LT.DigitalOffice.WikiService.Data.Interfaces;
 using LT.DigitalOffice.WikiService.Mappers.PatchDocument.Interfaces;
+using LT.DigitalOffice.WikiService.Models.Db;
 using LT.DigitalOffice.WikiService.Models.Dto.Requests.Rubric;
 using LT.DigitalOffice.WikiService.Validation.Rubric.Interfaces;
 using Microsoft.AspNetCore.Http;
@@ -45,31 +46,30 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric
 
     public async Task<OperationResultResponse<bool>> ExecuteAsync(Guid rubricId, JsonPatchDocument<EditRubricRequest> request)
     {
-      OperationResultResponse<bool> response = new();
-
       if (!await _accessValidator.HasRightsAsync(Rights.AddEditRemoveWiki))
       {
         return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.Forbidden);
       }
 
-      ValidationResult validationResult = await _validator.ValidateAsync((rubricId, request));
+      DbRubric rubric = await _rubricRepository.GetAsync(rubricId);
+      ValidationResult validationResult = await _validator.ValidateAsync((rubric, request));
 
       if (!validationResult.IsValid)
       {
-        return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.BadRequest,
+        return _responseCreator.CreateFailureResponse<bool>
+          (HttpStatusCode.BadRequest,
           validationResult.Errors.Select(e => e.ErrorMessage).ToList());
       }
 
-      response.Body = await _rubricRepository.EditAsync(rubricId, _mapper.Map(request));
+      OperationResultResponse<bool> response = new();
 
-      response.Status = OperationResultStatusType.FullSuccess;
+      response.Body = await _rubricRepository.EditAsync(rubric, _mapper.Map(request));
+
+      response.Status = default;
 
       if (!response.Body)
       {
-        _httpContextAccessor.HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-
-        response.Status = OperationResultStatusType.Failed;
-        response.Errors.Add("Rubric can not be edit.");
+        return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.NotFound);
       }
 
       return response;

@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace LT.DigitalOffice.WikiService.Validation.Rubric
 {
-  public class EditRubricRequestValidator : ExtendedEditRequestValidator<Guid, EditRubricRequest>, IEditRubricRequestValidator
+  public class EditRubricRequestValidator : ExtendedEditRequestValidator<DbRubric, EditRubricRequest>, IEditRubricRequestValidator
   {
     private readonly IRubricRepository _rubricRepository;
 
@@ -34,9 +34,9 @@ namespace LT.DigitalOffice.WikiService.Validation.Rubric
           nameof(EditRubricRequest.IsActive)
         });
 
-      AddСorrectOperations(nameof(EditRubricRequest.Name), new List<OperationType> { OperationType.Replace });
-      AddСorrectOperations(nameof(EditRubricRequest.ParentId), new List<OperationType> { OperationType.Replace });
-      AddСorrectOperations(nameof(EditRubricRequest.IsActive), new List<OperationType> { OperationType.Replace });
+      AddСorrectOperations(nameof(EditRubricRequest.Name), new () { OperationType.Replace });
+      AddСorrectOperations(nameof(EditRubricRequest.ParentId), new () { OperationType.Replace });
+      AddСorrectOperations(nameof(EditRubricRequest.IsActive), new () { OperationType.Replace });
 
       #endregion
 
@@ -67,7 +67,7 @@ namespace LT.DigitalOffice.WikiService.Validation.Rubric
        new()
        {
          {
-           x => bool.TryParse(x.value?.ToString(), out bool _), "Incorrect rubric is active format"
+           x => bool.TryParse(x.value?.ToString(), out bool _), "Incorrect rubric IsActive format"
          },
        }, CascadeMode.Stop);
 
@@ -80,13 +80,6 @@ namespace LT.DigitalOffice.WikiService.Validation.Rubric
         x => x == OperationType.Replace,
         new()
         {
-          {
-            x => Task.FromResult(
-              string.IsNullOrEmpty(x.value?.ToString())
-              ? true
-              : Guid.TryParse(x.value.ToString(), out Guid result)),
-            "Incorrect format of ParentId."
-          },
           {
             async (x) =>
             {
@@ -117,79 +110,45 @@ namespace LT.DigitalOffice.WikiService.Validation.Rubric
       RuleForEach(x => x.Item2.Operations)
         .CustomAsync(async (x, context, _) => await HandleInternalPropertyValidationAsync(x, context));
 
-      When(x => x.Item2.Operations.Any(o => o.path.EndsWith(nameof(EditRubricRequest.ParentId), StringComparison.OrdinalIgnoreCase)) == true
-        && x.Item2.Operations.Any(o => o.path.EndsWith(nameof(EditRubricRequest.Name), StringComparison.OrdinalIgnoreCase)) == true,
+      When(x => x.Item2.Operations.Any(o =>
+        (o.path.EndsWith(nameof(EditRubricRequest.ParentId), StringComparison.OrdinalIgnoreCase))
+        || (o.path.EndsWith(nameof(EditRubricRequest.Name), StringComparison.OrdinalIgnoreCase))),
         () =>
         {
           RuleFor(x => x)
-            .MustAsync(async (x, _) =>
-            {
-              string opValue = x.Item2.Operations.FirstOrDefault(
-                  o => o.path.EndsWith(nameof(EditRubricRequest.ParentId), StringComparison.OrdinalIgnoreCase)).value?.ToString();
+           .MustAsync(async (x, _) =>
+           {
+             Guid? _currentParentId = x.Item1.ParentId;
+             string _currentRubricName = x.Item1.Name;
 
-              if (opValue is null)
-              {
-                return !await _rubricRepository.DoesRubricNameExistAsync(
-                  null,
-                  x.Item2.Operations.FirstOrDefault(
-                    o => o.path.EndsWith(nameof(EditRubricRequest.Name), StringComparison.OrdinalIgnoreCase)).value?.ToString());
-              }
-              else if (Guid.TryParse(opValue, out Guid parentId))
-              {
-                return !await _rubricRepository.DoesRubricNameExistAsync(
-                  parentId,
-                  x.Item2.Operations.FirstOrDefault(
-                    o => o.path.EndsWith(nameof(EditRubricRequest.Name), StringComparison.OrdinalIgnoreCase)).value?.ToString());
-              }
-              
-              return false;
-            })
-            .WithMessage("Name already exists.");
+             foreach (Operation<EditRubricRequest> item in x.Item2.Operations)
+             {
+               if (item.path.EndsWith(nameof(EditRubricRequest.ParentId), StringComparison.OrdinalIgnoreCase))
+               {
+                 if (Guid.TryParse(item.value?.ToString(), out Guid parentId) == true || item.value is null)
+                 {
+                   _currentParentId = item.value is null
+                    ? null
+                    : parentId;
+                 }
+                 else
+                 {
+                   return false;
+                 }
+               }
+
+               if (item.path.EndsWith(nameof(EditRubricRequest.Name), StringComparison.OrdinalIgnoreCase))
+               {
+                 _currentRubricName = item.value?.ToString();
+               }
+             }
+
+             return (_currentParentId == x.Item1.ParentId && _currentRubricName == x.Item1.Name)
+              ? true
+              : !await _rubricRepository.DoesRubricNameExistAsync(_currentParentId, _currentRubricName);
+           })
+           .WithMessage("That name already exists.");
         });
-
-      When(x => !x.Item2.Operations.Any(o => o.path.EndsWith(nameof(EditRubricRequest.Name), StringComparison.OrdinalIgnoreCase))
-        && x.Item2.Operations.Any(o => o.path.EndsWith(nameof(EditRubricRequest.ParentId), StringComparison.OrdinalIgnoreCase)),
-        () =>
-        {
-          RuleFor(x => x)
-            .MustAsync(async (x, _) =>
-            {
-              DbRubric oldRubric = await _rubricRepository.GetAsync(x.Item1);
-              string rubricName = oldRubric.Name;
-              string opValue = x.Item2.Operations.FirstOrDefault(
-                  o => o.path.EndsWith(nameof(EditRubricRequest.ParentId), StringComparison.OrdinalIgnoreCase)).value?.ToString();
-
-              if (opValue is null)
-              {
-                return !await _rubricRepository.DoesRubricNameExistAsync(null, rubricName);
-              }
-              else if (Guid.TryParse(opValue, out Guid parentId))
-              {
-                return !await _rubricRepository.DoesRubricNameExistAsync(parentId, rubricName);
-              }
-              
-              return false;
-            })
-            .WithMessage("Name already exists.");
-        });
-
-      When(x => !x.Item2.Operations.Any(o => o.path.EndsWith(nameof(EditRubricRequest.ParentId), StringComparison.OrdinalIgnoreCase))
-        && x.Item2.Operations.Any(o => o.path.EndsWith(nameof(EditRubricRequest.Name), StringComparison.OrdinalIgnoreCase)),
-        () =>
-        {
-          RuleFor(x => x)
-            .MustAsync(async (x, _) =>
-            {
-              DbRubric oldRubric = await _rubricRepository.GetAsync(x.Item1);
-              Guid? rubricParentId = oldRubric.ParentId;
-              
-              return !await _rubricRepository.DoesRubricNameExistAsync(
-                rubricParentId,
-                x.Item2.Operations.FirstOrDefault(
-                  o => o.path.EndsWith(nameof(EditRubricRequest.Name), StringComparison.OrdinalIgnoreCase)).value?.ToString());
-            })
-            .WithMessage("Name already exists.");
-        });
-    }
+    }  
   }
 }
