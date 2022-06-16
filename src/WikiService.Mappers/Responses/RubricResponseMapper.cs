@@ -1,6 +1,7 @@
 ﻿using LT.DigitalOffice.WikiService.Mappers.Models.Interfaces;
 using LT.DigitalOffice.WikiService.Mappers.Responses.Interfaces;
 using LT.DigitalOffice.WikiService.Models.Db;
+using LT.DigitalOffice.WikiService.Models.Dto.Models;
 using LT.DigitalOffice.WikiService.Models.Dto.Responses.Rubric;
 using System.Linq;
 
@@ -10,6 +11,7 @@ namespace LT.DigitalOffice.WikiService.Mappers.Responses
   {
     private readonly IRubricInfoMapper _rubricInfoMapper;
     private readonly IArticleInfoMapper _articleInfoMapper;
+
     public RubricResponseMapper(
       IRubricInfoMapper rubricInfoMapper,
       IArticleInfoMapper articleInfoMapper)
@@ -17,8 +19,9 @@ namespace LT.DigitalOffice.WikiService.Mappers.Responses
       _rubricInfoMapper = rubricInfoMapper;
       _articleInfoMapper = articleInfoMapper;
     }
+
     public RubricResponse Map(
-      DbRubric dbRubric)
+      DbRubric dbRubric, bool includeSubRubrics)
     {
       if (dbRubric is null)
       {
@@ -27,13 +30,24 @@ namespace LT.DigitalOffice.WikiService.Mappers.Responses
 
       return new RubricResponse
       {
-        Rubric = _rubricInfoMapper.Map(dbRubric),
+        Rubric = new RubricInfo
+        {
+          Id = dbRubric.Id,
+          Name = dbRubric.Name,
+          ParentId = dbRubric.ParentId,
+          IsActive = dbRubric.IsActive,
+          HasChild = dbRubric.SubRubrics.Any()
+            ? true 
+            : false
+        },
 
-        SubRubrics = dbRubric.SubRubrics
-        ?.Select(x => _rubricInfoMapper.Map(x)),
+        SubRubrics = includeSubRubrics
+          ? dbRubric.SubRubrics?
+              .Select(x => _rubricInfoMapper.Map(x))
+          : null,
 
-        Articles = dbRubric.Articles
-        ?.Select(x => _articleInfoMapper.Map(x))
+        Articles = dbRubric.Articles?
+          .Select(x => _articleInfoMapper.Map(x))
       };
     }
   }

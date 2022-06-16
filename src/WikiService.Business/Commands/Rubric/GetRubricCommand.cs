@@ -3,9 +3,9 @@ using LT.DigitalOffice.Kernel.Responses;
 using LT.DigitalOffice.WikiService.Business.Commands.Rubric.Interfaces;
 using LT.DigitalOffice.WikiService.Data.Interfaces;
 using LT.DigitalOffice.WikiService.Mappers.Responses.Interfaces;
+using LT.DigitalOffice.WikiService.Models.Db;
 using LT.DigitalOffice.WikiService.Models.Dto.Requests.Rubric.Filters;
 using LT.DigitalOffice.WikiService.Models.Dto.Responses.Rubric;
-using Microsoft.AspNetCore.Http;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -31,10 +31,12 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric
     {
       OperationResultResponse<RubricResponse> response = new();
 
-      response.Body = 
-        _rubricResponseMapper.Map(await _rubricRepository.GetAsync(filter));
+      (DbRubric dbRubric, filter.IncludeSubRubrics) = await _rubricRepository.GetAsync(filter);
 
-      return response.Body == null
+      response.Body = 
+        _rubricResponseMapper.Map(dbRubric, filter.IncludeSubRubrics);
+
+      return response.Body is null
         ? _responseCreator.CreateFailureResponse<RubricResponse>(HttpStatusCode.NotFound)
 :       response;
     }

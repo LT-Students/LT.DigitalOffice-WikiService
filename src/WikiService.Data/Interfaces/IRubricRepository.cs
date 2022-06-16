@@ -18,6 +18,7 @@ namespace LT.DigitalOffice.WikiService.Data.Interfaces
 
     Task<(List<DbRubric> dbRubric, int totalCount)> FindAsync(FindRubricFilter filter);
 
-    Task<DbRubric> GetAsync(GetRubricFilter filter);
+    Task<(DbRubric, bool)> GetAsync(GetRubricFilter filter);
+
   }
 }

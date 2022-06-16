@@ -113,14 +113,16 @@ namespace LT.DigitalOffice.WikiService.Data
       return await _provider.Rubrics.AnyAsync(p => p.ParentId == rubricParentId && p.Name == nameRubric);
     }
 
-    public async Task<DbRubric> GetAsync(GetRubricFilter filter)
+    public async Task<(DbRubric, bool)> GetAsync(GetRubricFilter filter)
     {
       IQueryable<DbRubric> dbRubrics = _provider.Rubrics.AsQueryable();
 
+      dbRubrics = _provider.Rubrics.Include(x => x.SubRubrics);
+
+      await dbRubrics.ToListAsync();
+
       if (filter.IncludeSubRubrics)
       {
-        dbRubrics = _provider.Rubrics.Include(x => x.SubRubrics);
-
         foreach (DbRubric subRubric in dbRubrics)
         {
           if (subRubric.SubRubrics.Any())
@@ -135,15 +137,9 @@ namespace LT.DigitalOffice.WikiService.Data
         dbRubrics = _provider.Rubrics.Include(x => x.Articles);
       }
 
-      DbRubric dbRubric = await dbRubrics
-         .FirstOrDefaultAsync(x => x.Id == filter.RubricId);
-
-      if (dbRubrics.Any(x => x.ParentId == filter.RubricId))
-      {
-        dbRubric.HasChild = true;
-      }
-
-      return dbRubric;
+      return (
+        await dbRubrics.FirstOrDefaultAsync(x => x.Id == filter.RubricId),
+        filter.IncludeSubRubrics);
     }
   }
 }
