@@ -45,7 +45,7 @@ namespace LT.DigitalOffice.WikiService.Validation.Article
         x => x == OperationType.Replace,
         new()
         {
-          { x => !string.IsNullOrEmpty(x.value?.ToString().Trim()), "Name can't be empty." },
+          { x => !string.IsNullOrWhiteSpace(x.value?.ToString()), "Name can't be empty." },
           { x => x.value?.ToString().Trim().Length < 151, "Max lenght of article name is 150 symbols." },
         },
         CascadeMode.Stop);
@@ -58,7 +58,7 @@ namespace LT.DigitalOffice.WikiService.Validation.Article
         x => x == OperationType.Replace,
         new()
         {
-          { x => !string.IsNullOrEmpty(x.value?.ToString().Trim()), "Article content can't be empty." }
+          { x => !string.IsNullOrWhiteSpace(x.value?.ToString()), "Article content can't be empty." }
         });
       #endregion
 
@@ -109,11 +109,13 @@ namespace LT.DigitalOffice.WikiService.Validation.Article
 
              foreach (Operation<EditArticleRequest> item in x.Item2.Operations)
              {
-               _currentRubricId = item.path.EndsWith(nameof(EditArticleRequest.RubricId))
+               _currentRubricId = item.path.EndsWith(nameof(EditArticleRequest.RubricId), StringComparison.OrdinalIgnoreCase)
                  ? Guid.TryParse(item.value?.ToString(), out Guid _rubricIdParseResult) ? _rubricIdParseResult : _currentRubricId
                  : _currentRubricId;
 
-               _currentArticleName = item.path.EndsWith(nameof(EditArticleRequest.Name)) ? item.value?.ToString() : _currentArticleName;
+               _currentArticleName = item.path.EndsWith(nameof(EditArticleRequest.Name), StringComparison.OrdinalIgnoreCase)
+               ? item.value?.ToString()
+               : _currentArticleName;
              }
 
              return (_currentRubricId == x.Item1.RubricId && _currentArticleName == x.Item1.Name)
