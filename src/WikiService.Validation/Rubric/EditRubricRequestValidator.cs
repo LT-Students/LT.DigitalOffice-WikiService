@@ -34,9 +34,9 @@ namespace LT.DigitalOffice.WikiService.Validation.Rubric
           nameof(EditRubricRequest.IsActive)
         });
 
-      AddСorrectOperations(nameof(EditRubricRequest.Name), new () { OperationType.Replace });
-      AddСorrectOperations(nameof(EditRubricRequest.ParentId), new () { OperationType.Replace });
-      AddСorrectOperations(nameof(EditRubricRequest.IsActive), new () { OperationType.Replace });
+      AddСorrectOperations(nameof(EditRubricRequest.Name), new() { OperationType.Replace });
+      AddСorrectOperations(nameof(EditRubricRequest.ParentId), new() { OperationType.Replace });
+      AddСorrectOperations(nameof(EditRubricRequest.IsActive), new() { OperationType.Replace });
 
       #endregion
 
@@ -67,9 +67,9 @@ namespace LT.DigitalOffice.WikiService.Validation.Rubric
        new()
        {
          {
-           x => bool.TryParse(x.value?.ToString(), out bool _), "Incorrect rubric IsActive format"
+           x => bool.TryParse(x.value?.ToString(), out bool _), "Incorrect rubric is active format"
          },
-       }, CascadeMode.Stop);
+       });
 
       #endregion
 
@@ -88,7 +88,7 @@ namespace LT.DigitalOffice.WikiService.Validation.Rubric
                 return true;
               }
 
-              if (!Guid.TryParse(x.value?.ToString(), out Guid parentId))
+              if (!Guid.TryParse(x.value.ToString(), out Guid parentId))
               {
                 return false;
               }
@@ -97,13 +97,13 @@ namespace LT.DigitalOffice.WikiService.Validation.Rubric
             },
             "Parent id doesn`t exist."
           }
-        }, CascadeMode.Stop);
+        });
     }
 
     #endregion
 
     public EditRubricRequestValidator(
-        IRubricRepository rubricRepository)
+      IRubricRepository rubricRepository)
     {
       _rubricRepository = rubricRepository;
 
@@ -125,7 +125,7 @@ namespace LT.DigitalOffice.WikiService.Validation.Rubric
              {
                if (item.path.EndsWith(nameof(EditRubricRequest.ParentId), StringComparison.OrdinalIgnoreCase))
                {
-                 if (Guid.TryParse(item.value?.ToString(), out Guid parentId) || item.value is null)
+                 if (Guid.TryParse(item.value.ToString(), out Guid parentId) || item.value is null)
                  {
                    _currentParentId = item.value is null
                     ? null
@@ -133,7 +133,7 @@ namespace LT.DigitalOffice.WikiService.Validation.Rubric
                  }
                  else
                  {
-                   return false;
+                   return true;
                  }
                }
 

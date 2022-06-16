@@ -52,6 +52,12 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric
       }
 
       DbRubric rubric = await _rubricRepository.GetAsync(rubricId);
+
+      if (rubric is null)
+      {
+        return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.NotFound);
+      }
+      
       ValidationResult validationResult = await _validator.ValidateAsync((rubric, request));
 
       if (!validationResult.IsValid)
@@ -64,13 +70,6 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric
       OperationResultResponse<bool> response = new();
 
       response.Body = await _rubricRepository.EditAsync(rubric, _mapper.Map(request));
-
-      response.Status = default;
-
-      if (!response.Body)
-      {
-        return _responseCreator.CreateFailureResponse<bool>(HttpStatusCode.NotFound);
-      }
 
       return response;
     }

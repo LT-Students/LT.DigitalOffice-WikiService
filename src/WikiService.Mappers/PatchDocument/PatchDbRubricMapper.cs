@@ -10,7 +10,7 @@ namespace LT.DigitalOffice.WikiService.Mappers.PatchDocument
   {
     public JsonPatchDocument<DbRubric> Map(JsonPatchDocument<EditRubricRequest> request)
     {
-      if (request == null)
+      if (request is null)
       {
         return null;
       }

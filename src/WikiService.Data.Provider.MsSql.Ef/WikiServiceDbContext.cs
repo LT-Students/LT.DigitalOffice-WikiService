@@ -1,4 +1,4 @@
-﻿using LT.DigitalOffice.Kernel.Database;
+﻿using LT.DigitalOffice.Kernel.EFSupport.Provider;
 using LT.DigitalOffice.WikiService.Models.Db;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
