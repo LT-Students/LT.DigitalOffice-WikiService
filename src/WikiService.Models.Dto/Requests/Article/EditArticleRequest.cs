@@ -2,5 +2,11 @@
 
 namespace LT.DigitalOffice.WikiService.Models.Dto.Requests.Article
 {
-  public record EditArticleRequest(string Name, string Content, bool IsActive, Guid RubricId);
+  public class EditArticleRequest
+  {
+    public string Name;
+    public string Content;
+    public bool IsActive;
+    public Guid RubricId;
+  }
 }

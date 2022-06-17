@@ -79,51 +79,51 @@ namespace LT.DigitalOffice.WikiService.Validation.Article
         new()
         {
           {
-            async x => await _rubricRepository.DoesExistAsync(
-            Guid.TryParse(x.value?.ToString(), out Guid _rubricId) ? _rubricId : default
-            ),
-            "This rubric id doesn't exist."
+            async x => Guid.TryParse(x.value?.ToString(), out Guid _rubricId)
+              ? await _rubricRepository.DoesExistAsync(_rubricId)
+              : false,
+              "This rubric id doesn't exist."
           }
         });
       #endregion
     }
 
     public EditArticleRequestValidator(IArticleRepository articleRepository, IRubricRepository rubricRepository)
-    {
-      _articleRepository = articleRepository;
-      _rubricRepository = rubricRepository;
+      {
+        _articleRepository = articleRepository;
+        _rubricRepository = rubricRepository;
 
-      RuleForEach(x => x.Item2.Operations)
-        .CustomAsync(async (x, context, _) => await HandleInternalPropertyValidationAsync(x, context));
+        RuleForEach(x => x.Item2.Operations)
+          .CustomAsync(async (x, context, _) => await HandleInternalPropertyValidationAsync(x, context));
 
-      When(x => x.Item2.Operations.Any(o =>
-        (o.path.EndsWith(nameof(EditArticleRequest.RubricId), StringComparison.OrdinalIgnoreCase))
-        || (o.path.EndsWith(nameof(EditArticleRequest.Name), StringComparison.OrdinalIgnoreCase))),
-        () =>
-        {
-          RuleFor(x => x)
-           .MustAsync(async (x, _) =>
-           {
-             Guid _currentRubricId = x.Item1.RubricId;
-             string _currentArticleName = x.Item1.Name;
-
-             foreach (Operation<EditArticleRequest> item in x.Item2.Operations)
+        When(x => x.Item2.Operations.Any(o =>
+          (o.path.EndsWith(nameof(EditArticleRequest.RubricId), StringComparison.OrdinalIgnoreCase))
+          || (o.path.EndsWith(nameof(EditArticleRequest.Name), StringComparison.OrdinalIgnoreCase))),
+          () =>
+          {
+            RuleFor(x => x)
+             .MustAsync(async (x, _) =>
              {
-               _currentRubricId = item.path.EndsWith(nameof(EditArticleRequest.RubricId), StringComparison.OrdinalIgnoreCase)
-                 ? Guid.TryParse(item.value?.ToString(), out Guid _rubricIdParseResult) ? _rubricIdParseResult : _currentRubricId
-                 : _currentRubricId;
+               Guid _currentRubricId = x.Item1.RubricId;
+               string _currentArticleName = x.Item1.Name;
 
-               _currentArticleName = item.path.EndsWith(nameof(EditArticleRequest.Name), StringComparison.OrdinalIgnoreCase)
-               ? item.value?.ToString()
-               : _currentArticleName;
-             }
+               foreach (Operation<EditArticleRequest> item in x.Item2.Operations)
+               {
+                 _currentRubricId = item.path.EndsWith(nameof(EditArticleRequest.RubricId), StringComparison.OrdinalIgnoreCase)
+                   ? Guid.TryParse(item.value?.ToString(), out Guid _rubricIdParseResult) ? _rubricIdParseResult : _currentRubricId
+                   : _currentRubricId;
 
-             return (_currentRubricId == x.Item1.RubricId && _currentArticleName == x.Item1.Name)
-             ? true
-             : !await _articleRepository.DoesSameNameExistAsync(_currentRubricId, _currentArticleName);
-           })
-           .WithMessage("That article name already exists in this rubric.");
-        });
+                 _currentArticleName = item.path.EndsWith(nameof(EditArticleRequest.Name), StringComparison.OrdinalIgnoreCase)
+                  ? item.value?.ToString()
+                  : _currentArticleName;
+               }
+
+               return (_currentRubricId == x.Item1.RubricId && _currentArticleName == x.Item1.Name)
+                ? true
+                : !await _articleRepository.DoesSameNameExistAsync(_currentRubricId, _currentArticleName);
+             })
+             .WithMessage("That article name already exists in this rubric.");
+          });
+      }
     }
   }
-}
