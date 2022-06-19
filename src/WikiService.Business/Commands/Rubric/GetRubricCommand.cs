@@ -38,7 +38,7 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric
 
       return response.Body is null
         ? _responseCreator.CreateFailureResponse<RubricResponse>(HttpStatusCode.NotFound)
-:       response;
+        : response;
     }
   }
 }
