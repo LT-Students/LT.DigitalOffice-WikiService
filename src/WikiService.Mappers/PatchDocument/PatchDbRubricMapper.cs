@@ -17,7 +17,7 @@ namespace LT.DigitalOffice.WikiService.Mappers.PatchDocument
 
       JsonPatchDocument<DbRubric> dbRequest = new JsonPatchDocument<DbRubric>();
 
-      foreach (var item in request.Operations)
+      foreach (Operation<EditRubricRequest> item in request.Operations)
       {
         dbRequest.Operations.Add(new Operation<DbRubric>(item.op, item.path, item.from, item.value));
       }

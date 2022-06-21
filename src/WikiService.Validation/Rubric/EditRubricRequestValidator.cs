@@ -88,12 +88,9 @@ namespace LT.DigitalOffice.WikiService.Validation.Rubric
                 return true;
               }
 
-              if (!Guid.TryParse(x.value.ToString(), out Guid parentId))
-              {
-                return false;
-              }
-
-              return await _rubricRepository.DoesExistAsync(parentId);
+              return Guid.TryParse(x.value.ToString(), out Guid parentId)
+                ? await _rubricRepository.DoesExistAsync(parentId)
+                : false;
             },
             "Parent id doesn`t exist."
           }
