@@ -1,27 +1,28 @@
+using HealthChecks.UI.Client;
 using LT.DigitalOffice.Kernel.BrokerSupport.Configurations;
 using LT.DigitalOffice.Kernel.BrokerSupport.Extensions;
 using LT.DigitalOffice.Kernel.BrokerSupport.Helpers;
 using LT.DigitalOffice.Kernel.BrokerSupport.Middlewares.Token;
 using LT.DigitalOffice.Kernel.Configurations;
+using LT.DigitalOffice.Kernel.EFSupport.Extensions;
+using LT.DigitalOffice.Kernel.EFSupport.Helpers;
 using LT.DigitalOffice.Kernel.Extensions;
-using LT.DigitalOffice.Kernel.Helpers;
 using LT.DigitalOffice.Kernel.Middlewares.ApiInformation;
+using LT.DigitalOffice.WikiService.Data.Provider.MsSql.Ef;
+using LT.DigitalOffice.WikiService.Models.Dto.Configurations;
 using MassTransit;
-using MassTransit.RabbitMqTransport;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Logging;
 using Serilog;
 using System;
-using LT.DigitalOffice.WikiService.Models.Dto.Configurations;
-using LT.DigitalOffice.WikiService.Data.Provider.MsSql.Ef;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Diagnostics.HealthChecks;
-using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
-using HealthChecks.UI.Client;
+using System.Text.Json.Serialization;
 
 namespace LT.DigitalOffice.WikiService
 {
@@ -68,17 +69,7 @@ namespace LT.DigitalOffice.WikiService
           });
       });
 
-      string connStr = Environment.GetEnvironmentVariable("ConnectionString");
-      if (string.IsNullOrEmpty(connStr))
-      {
-        connStr = Configuration.GetConnectionString("SQLConnectionString");
-
-        Log.Information($"SQL connection string from appsettings.json was used. Value '{PasswordHider.Hide(connStr)}'.");
-      }
-      else
-      {
-        Log.Information($"SQL connection string from environment was used. Value '{PasswordHider.Hide(connStr)}'.");
-      }
+      string connStr = ConnectionStringHandler.Get(Configuration);
 
       services.AddHttpContextAccessor();
 
@@ -97,7 +88,13 @@ namespace LT.DigitalOffice.WikiService
 
       services.AddMemoryCache();
       services.AddBusinessObjects();
-      services.AddControllers();
+      services
+        .AddControllers()
+        .AddJsonOptions(options =>
+        {
+          options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        })
+        .AddNewtonsoftJson();
 
       ConfigureMassTransit(services);
     }
@@ -129,16 +126,7 @@ namespace LT.DigitalOffice.WikiService
       return (GetString("RabbitMqUsername", _rabbitMqConfig.Username, $"{_serviceInfoConfig.Name}_{_serviceInfoConfig.Id}", "Username"),
         GetString("RabbitMqPassword", _rabbitMqConfig.Password, _serviceInfoConfig.Id, "Password"));
     }
-    private void UpdateDatabase(IApplicationBuilder app)
-    {
-      using var serviceScope = app.ApplicationServices
-        .GetRequiredService<IServiceScopeFactory>()
-        .CreateScope();
 
-      using var context = serviceScope.ServiceProvider.GetService<WikiServiceDbContext>();
-
-      context.Database.Migrate();
-    }
     private void ConfigureMassTransit(IServiceCollection services)
     {
       (string username, string password) = RabbitMqCredentialsHelper
@@ -162,7 +150,7 @@ namespace LT.DigitalOffice.WikiService
 
     public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory)
     {
-      UpdateDatabase(app);
+      app.UpdateDatabase<WikiServiceDbContext>();
 
       app.UseForwardedHeaders();
 
