@@ -126,7 +126,7 @@ namespace LT.DigitalOffice.WikiService
       return (GetString("RabbitMqUsername", _rabbitMqConfig.Username, $"{_serviceInfoConfig.Name}_{_serviceInfoConfig.Id}", "Username"),
         GetString("RabbitMqPassword", _rabbitMqConfig.Password, _serviceInfoConfig.Id, "Password"));
     }
-   
+
     private void ConfigureMassTransit(IServiceCollection services)
     {
       (string username, string password) = RabbitMqCredentialsHelper

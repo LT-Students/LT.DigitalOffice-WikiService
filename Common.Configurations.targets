@@ -32,6 +32,24 @@
     <PackageReference Include="LT.DigitalOffice.Models" Version="1.0.83" />
   </ItemGroup>
 
+  <ItemGroup Condition="$(AssemblyName.Contains('.UnitTests')) != 'true'">
+    <PackageReference Include="LT.DigitalOffice.Kernel" Version="1.1.60" />
+    <PackageReference Include="LT.DigitalOffice.Kernel.BrokerSupport" Version="1.0.5" />
+    <PackageReference Include="LT.DigitalOffice.Models" Version="1.0.83" />
+  </ItemGroup>
+
+  <ItemGroup Condition="$(AssemblyName.Contains('.UnitTests')) != 'true'">
+    <PackageReference Include="LT.DigitalOffice.Kernel" Version="1.1.60" />
+    <PackageReference Include="LT.DigitalOffice.Kernel.BrokerSupport" Version="1.0.5" />
+    <PackageReference Include="LT.DigitalOffice.Models" Version="1.0.83" />
+  </ItemGroup>
+
+  <ItemGroup Condition="$(AssemblyName.Contains('.UnitTests')) != 'true'">
+    <PackageReference Include="LT.DigitalOffice.Kernel" Version="1.1.60" />
+    <PackageReference Include="LT.DigitalOffice.Kernel.BrokerSupport" Version="1.0.5" />
+    <PackageReference Include="LT.DigitalOffice.Models" Version="1.0.83" />
+  </ItemGroup>
+
   <ItemGroup Condition="$(AssemblyName.Contains('.UnitTests'))">
     <PackageReference Include="LT.DigitalOffice.UnitTestKernel" Version="1.0.4" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.17.0" />
