@@ -1,7 +1,10 @@
-﻿using LT.DigitalOffice.WikiService.Data.Interfaces;
+﻿using LT.DigitalOffice.Kernel.Extensions;
+using LT.DigitalOffice.WikiService.Data.Interfaces;
 using LT.DigitalOffice.WikiService.Data.Provider;
 using LT.DigitalOffice.WikiService.Models.Db;
 using LT.DigitalOffice.WikiService.Models.Dto.Requests.Rubric.Filters;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -14,6 +17,15 @@ namespace LT.DigitalOffice.WikiService.Data
   public class RubricRepository : IRubricRepository
   {
     private readonly IDataProvider _provider;
+    private readonly IHttpContextAccessor _httpContextAccessor;
+
+    public RubricRepository(
+      IDataProvider provider,
+      IHttpContextAccessor httpContextAccessor)
+    {
+      _provider = provider;
+      _httpContextAccessor = httpContextAccessor;
+    }
 
     private IQueryable<DbRubric> CreateFindPredicates(
       FindRubricFilter filter,
@@ -111,6 +123,27 @@ namespace LT.DigitalOffice.WikiService.Data
       return dbRubric.Id;
     }
 
+    public async Task<DbRubric> GetAsync(Guid rubricId)
+    {
+      return await _provider.Rubrics.FirstOrDefaultAsync(x => x.Id == rubricId);
+    }
+
+    public async Task<bool> EditAsync(DbRubric dbRubric, JsonPatchDocument<DbRubric> request)
+    {
+      if (dbRubric is null || request is null)
+      {
+        return false;
+      }
+
+      request.ApplyTo(dbRubric);
+      dbRubric.ModifiedBy = _httpContextAccessor.HttpContext.GetUserId();
+      dbRubric.ModifiedAtUtc = DateTime.UtcNow;
+
+      await _provider.SaveAsync();
+
+      return true;
+    }
+
     public async Task<bool> DoesExistAsync(Guid rubricId)
     {
       return await _provider.Rubrics.AnyAsync(x => x.Id == rubricId);
@@ -118,7 +151,7 @@ namespace LT.DigitalOffice.WikiService.Data
 
     public async Task<bool> DoesRubricNameExistAsync(Guid? rubricParentId, string nameRubric)
     {
-      return await _provider.Rubrics.AnyAsync(p => p.ParentId == rubricParentId && p.Name == nameRubric);
+      return await _provider.Rubrics.AnyAsync(p => p.ParentId == rubricParentId && p.Name.ToLower() == nameRubric.ToLower());
     }
   }
 }

@@ -1,7 +1,7 @@
 ﻿using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.WikiService.Mappers.Db.Interfaces;
 using LT.DigitalOffice.WikiService.Models.Db;
-using LT.DigitalOffice.WikiService.Models.Dto.Requests;
+using LT.DigitalOffice.WikiService.Models.Dto.Requests.Rubric;
 using Microsoft.AspNetCore.Http;
 using System;
 
