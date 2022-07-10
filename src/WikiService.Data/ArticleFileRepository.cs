@@ -1,5 +1,10 @@
 ﻿using LT.DigitalOffice.WikiService.Data.Interfaces;
 using LT.DigitalOffice.WikiService.Data.Provider;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace LT.DigitalOffice.WikiService.Data
 {
@@ -11,6 +16,30 @@ namespace LT.DigitalOffice.WikiService.Data
       IDataProvider provider)
     {
       _provider = provider;
+    }
+    public async Task<bool> RemoveAsync(List<Guid> filesIds)
+    {
+      bool isRemoveSuccess = false;
+
+      if (filesIds == null)
+      {
+        return isRemoveSuccess;
+      }
+
+      if (await _provider
+        .ArticlesFiles
+        .AnyAsync(x => filesIds.Contains(x.FileId)))
+      {
+        _provider.ArticlesFiles.RemoveRange(
+          _provider.ArticlesFiles
+          .Where(x => filesIds.Contains(x.FileId)));
+
+        await _provider.SaveAsync();
+
+        isRemoveSuccess = true;
+      }
+
+      return isRemoveSuccess;
     }
   }
 }

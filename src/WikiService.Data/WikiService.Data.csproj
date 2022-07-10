@@ -8,4 +8,8 @@
 		<ProjectReference Include="..\WikiService.Models.Dto\WikiService.Models.Dto.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <PackageReference Update="LT.DigitalOffice.Kernel" Version="1.1.61" />
+	</ItemGroup>
+
 </Project>
