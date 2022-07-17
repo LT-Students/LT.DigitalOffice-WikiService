@@ -11,4 +11,8 @@
 	  <Folder Include="Db\" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <PackageReference Update="LT.DigitalOffice.Kernel" Version="1.1.61" />
+	</ItemGroup>
+
 </Project>

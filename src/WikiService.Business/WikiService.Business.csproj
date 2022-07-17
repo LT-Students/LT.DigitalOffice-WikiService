@@ -9,4 +9,8 @@
 		<ProjectReference Include="..\WikiService.Validation\WikiService.Validation.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <PackageReference Update="LT.DigitalOffice.Kernel" Version="1.1.61" />
+	</ItemGroup>
+
 </Project>

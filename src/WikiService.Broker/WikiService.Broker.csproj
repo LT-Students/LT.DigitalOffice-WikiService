@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<Import Project="$(ProjectDir)..\..\Common.Configurations.targets" />
 
@@ -10,6 +10,10 @@
 		<ProjectReference Include="..\WikiService.Data\WikiService.Data.csproj" />
 		<ProjectReference Include="..\WikiService.Mappers\WikiService.Mappers.csproj" />
 		<ProjectReference Include="..\WikiService.Models.Db\WikiService.Models.Db.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <PackageReference Update="LT.DigitalOffice.Kernel" Version="1.1.61" />
 	</ItemGroup>
 
 </Project>

@@ -22,6 +22,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <PackageReference Update="LT.DigitalOffice.Kernel" Version="1.1.61" />
 	  <PackageReference Update="LT.DigitalOffice.Kernel.RedisSupport" Version="1.0.5" />
 	  <PackageReference Update="LT.DigitalOffice.Models" Version="1.0.83" />
 	</ItemGroup>
