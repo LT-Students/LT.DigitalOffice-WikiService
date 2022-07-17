@@ -19,13 +19,6 @@ namespace LT.DigitalOffice.WikiService.Data
     }
     public async Task<bool> RemoveAsync(List<Guid> filesIds)
     {
-      bool isRemoveSuccess = false;
-
-      if (filesIds == null)
-      {
-        return isRemoveSuccess;
-      }
-
       if (await _provider
         .ArticlesFiles
         .AnyAsync(x => filesIds.Contains(x.FileId)))
@@ -36,10 +29,9 @@ namespace LT.DigitalOffice.WikiService.Data
 
         await _provider.SaveAsync();
 
-        isRemoveSuccess = true;
+        return true;
       }
-
-      return isRemoveSuccess;
+      return false;
     }
   }
 }
