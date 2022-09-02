@@ -2,6 +2,7 @@
 using LT.DigitalOffice.WikiService.Business.Commands.Wiki.Interfaces;
 using LT.DigitalOffice.WikiService.Models.Dto.Responses.Wiki;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace LT.DigitalOffice.WikiService.Controllers
@@ -11,7 +12,7 @@ namespace LT.DigitalOffice.WikiService.Controllers
   public class WikiController
   {
     [HttpGet("get")]
-    public async Task<OperationResultResponse<WikiResponse>> GetAsync(
+    public async Task<OperationResultResponse<List<WikiResponse>>> GetAsync(
       [FromServices] IGetWikiCommand command)
     {
       return await command.ExecuteAsync();
