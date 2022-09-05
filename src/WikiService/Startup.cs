@@ -98,7 +98,7 @@ namespace LT.DigitalOffice.WikiService
         {
           options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
         })
-        .AddNewtonsoftJson();;
+        .AddNewtonsoftJson();
 
       ConfigureMassTransit(services);
     }
