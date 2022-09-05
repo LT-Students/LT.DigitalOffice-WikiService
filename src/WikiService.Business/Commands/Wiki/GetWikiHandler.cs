@@ -32,7 +32,7 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Wiki
 
       if (wikiTreeCache is null)
       {
-        List<RubricData> rubrics = await _dbContext.Rubrics.AsQueryable().Include(x => x.Articles).Select(x => new RubricData
+        List<RubricData> rubrics = await _dbContext.Rubrics.AsQueryable().Include(rubric => rubric.Articles).Select(x => new RubricData
         {
           Id = x.Id,
           Name = x.Name,
@@ -46,21 +46,16 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Wiki
           rubrics.RemoveAll(x => !x.IsActive);
         }
 
-        List<RubricData> result = rubrics.Select(x => new RubricData
+        foreach (RubricData rubric in rubrics)
         {
-          Id = x.Id,
-          Name = x.Name,
-          IsActive = x.IsActive,
-          ParentId = x.ParentId,
-          ArticlesNames = x.ArticlesNames,
-          Children = rubrics.Where(rubric => rubric.ParentId == x.Id).ToList()
-        }).ToList();
+          rubric.Children = rubrics.Where(r => r.ParentId == rubric.Id).ToList();
+        }
 
-        result.RemoveAll(x => x.ParentId is not null);
+        rubrics.RemoveAll(x => x.ParentId is not null);
 
         wikiTreeCache = _cache.Set(
           request.IncludeArchivals ? CacheKeys.WikiTreeWithArchivals : CacheKeys.WikiTreeWithoutArchivals,
-          result);
+          rubrics);
       }
 
        return wikiTreeCache;
