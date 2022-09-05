@@ -26,8 +26,8 @@ namespace LT.DigitalOffice.WikiService.Models.Db
         .HasKey(af => af.Id);
 
       builder
-        .HasOne(a => a.Article)
-        .WithMany(af => af.Files);
+        .HasOne(af => af.Article)
+        .WithMany(a => a.Files);
     }
   }
 }
