@@ -2,7 +2,7 @@
 {
   public static class CacheKeys
   {
-    public const string WikiTreeWithArchivals = "WikiTreeWithArchivals";
-    public const string WikiTreeWithoutArchivals = "WikiTreeWithoutArchivals";
+    public const string WikiTreeWithDeactivated = "WikiTreeWithDeactivated";
+    public const string WikiTreeWithoutDeactivated = "WikiTreeWithoutDeactivated";
   }
 }
