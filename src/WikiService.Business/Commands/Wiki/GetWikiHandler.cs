@@ -32,7 +32,7 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Wiki
 
       if (wikiTreeCache is null)
       {
-        List<RubricData> rubrics = await _dbContext.Rubrics.AsQueryable().Include(rubric => rubric.Articles)
+        List<RubricData> rubrics = await _dbContext.Rubrics.Include(rubric => rubric.Articles)
           .Where(x => x.IsActive == true || x.IsActive == !request.includeDeactivated).Select(x => new RubricData
             {
               Id = x.Id,
