@@ -9,7 +9,6 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace LT.DigitalOffice.WikiService.Data
@@ -123,9 +122,9 @@ namespace LT.DigitalOffice.WikiService.Data
       return dbRubric.Id;
     }
 
-    public async Task<DbRubric> GetAsync(Guid rubricId)
+    public Task<DbRubric> GetAsync(Guid rubricId)
     {
-      return await _provider.Rubrics.FirstOrDefaultAsync(x => x.Id == rubricId);
+      return _provider.Rubrics.FirstOrDefaultAsync(x => x.Id == rubricId);
     }
 
     public async Task<bool> EditAsync(DbRubric dbRubric, JsonPatchDocument<DbRubric> request)

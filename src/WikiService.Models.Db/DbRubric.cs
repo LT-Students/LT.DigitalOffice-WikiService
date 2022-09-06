@@ -38,8 +38,8 @@ namespace LT.DigitalOffice.WikiService.Models.Db
         .HasKey(r => r.Id);
 
       builder
-        .HasMany(a => a.Articles)
-        .WithOne(r => r.Rubric);
+        .HasMany(r => r.Articles)
+        .WithOne(a => a.Rubric);
 
       builder.Ignore(x => x.HasChild);
     }

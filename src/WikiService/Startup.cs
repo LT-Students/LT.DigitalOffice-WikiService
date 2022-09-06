@@ -8,9 +8,11 @@ using LT.DigitalOffice.Kernel.EFSupport.Extensions;
 using LT.DigitalOffice.Kernel.EFSupport.Helpers;
 using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.Middlewares.ApiInformation;
+using LT.DigitalOffice.WikiService.Business;
 using LT.DigitalOffice.WikiService.Data.Provider.MsSql.Ef;
 using LT.DigitalOffice.WikiService.Models.Dto.Configurations;
 using MassTransit;
+using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.EntityFrameworkCore;
@@ -85,6 +87,8 @@ namespace LT.DigitalOffice.WikiService
       services.Configure<TokenConfiguration>(Configuration.GetSection("CheckTokenMiddleware"));
       services.Configure<BaseServiceInfoConfig>(Configuration.GetSection(BaseServiceInfoConfig.SectionName));
       services.Configure<BaseRabbitMqConfig>(Configuration.GetSection(BaseRabbitMqConfig.SectionName));
+
+      services.AddMediatR(typeof(AssemblyMarker));
 
       services.AddMemoryCache();
       services.AddBusinessObjects();

@@ -39,12 +39,12 @@ namespace LT.DigitalOffice.WikiService.Models.Db
         .HasKey(a => a.Id);
 
       builder
-        .HasOne(r => r.Rubric)
-        .WithMany(a => a.Articles);
+        .HasOne(a => a.Rubric)
+        .WithMany(r => r.Articles);
 
       builder
-       .HasMany(af => af.Files)
-       .WithOne(a => a.Article);
+       .HasMany(a => a.Files)
+       .WithOne(af => af.Article);
     }
   }
 }
