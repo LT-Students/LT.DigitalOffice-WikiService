@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using FluentValidation.Validators;
 using LT.DigitalOffice.Kernel.Validators;
 using LT.DigitalOffice.WikiService.Data.Interfaces;
 using LT.DigitalOffice.WikiService.Models.Db;
@@ -68,7 +67,8 @@ namespace LT.DigitalOffice.WikiService.Validation.Rubric
        new()
        {
          {
-           x => bool.TryParse(x.value?.ToString(), out bool _), "Incorrect rubric is active format"
+           x => bool.TryParse(x.value?.ToString(), out bool _),
+           "Incorrect rubric is active format"
          },
        });
 
@@ -147,6 +147,6 @@ namespace LT.DigitalOffice.WikiService.Validation.Rubric
            })
            .WithMessage("That name already exists.");
         });
-    }  
+    }
   }
 }
