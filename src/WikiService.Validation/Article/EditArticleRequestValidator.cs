@@ -5,6 +5,7 @@ using LT.DigitalOffice.WikiService.Data.Interfaces;
 using LT.DigitalOffice.WikiService.Models.Db;
 using LT.DigitalOffice.WikiService.Models.Dto.Requests.Article;
 using LT.DigitalOffice.WikiService.Validation.Article.Interfaces;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.JsonPatch.Operations;
 using System;
 using System.Collections.Generic;
@@ -18,7 +19,9 @@ namespace LT.DigitalOffice.WikiService.Validation.Article
     private readonly IArticleRepository _articleRepository;
     private readonly IRubricRepository _rubricRepository;
 
-    private async Task HandleInternalPropertyValidationAsync(Operation<EditArticleRequest> requestedOperation, CustomContext context)
+    private async Task HandleInternalPropertyValidationAsync(
+      Operation<EditArticleRequest> requestedOperation, 
+      ValidationContext<(DbArticle, JsonPatchDocument<EditArticleRequest>)> context)
     {
       RequestedOperation = requestedOperation;
       Context = context;

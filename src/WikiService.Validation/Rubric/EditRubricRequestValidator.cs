@@ -5,6 +5,7 @@ using LT.DigitalOffice.WikiService.Data.Interfaces;
 using LT.DigitalOffice.WikiService.Models.Db;
 using LT.DigitalOffice.WikiService.Models.Dto.Requests.Rubric;
 using LT.DigitalOffice.WikiService.Validation.Rubric.Interfaces;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.JsonPatch.Operations;
 using System;
 using System.Collections.Generic;
@@ -19,7 +20,7 @@ namespace LT.DigitalOffice.WikiService.Validation.Rubric
 
     private async Task HandleInternalPropertyValidationAsync(
       Operation<EditRubricRequest> requestedOperation,
-      CustomContext context)
+      ValidationContext<(DbRubric, JsonPatchDocument<EditRubricRequest>)> context)
     {
       Context = context;
       RequestedOperation = requestedOperation;
