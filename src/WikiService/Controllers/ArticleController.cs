@@ -45,9 +45,13 @@ namespace LT.DigitalOffice.WikiService.Controllers
       [FromQuery] Guid articleId,
       CancellationToken ct)
     {
-      return Ok(await _mediator.Send(
+      ArticleResponse result = await _mediator.Send(
         new GetArticleRequest { Id = articleId },
-        ct));
+        ct);
+
+      return result is null
+        ? StatusCode(404)
+        : Ok(result);
     }
 
     [HttpPatch("edit")]
