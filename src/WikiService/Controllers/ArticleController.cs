@@ -1,6 +1,7 @@
 ﻿using LT.DigitalOffice.Kernel.BrokerSupport.AccessValidatorEngine.Interfaces;
 using LT.DigitalOffice.Kernel.Constants;
 using LT.DigitalOffice.WikiService.Business.Commands.Article.Edit;
+using LT.DigitalOffice.WikiService.Business.Commands.Article.Get;
 using LT.DigitalOffice.WikiService.Models.Dto.Requests.Article;
 using MediatR;
 using Microsoft.AspNetCore.JsonPatch;
@@ -44,7 +45,9 @@ namespace LT.DigitalOffice.WikiService.Controllers
       [FromQuery] Guid articleId,
       CancellationToken ct)
     {
-      return Ok(await _mediator.Send(articleId, ct));
+      return Ok(await _mediator.Send(
+        new GetArticleRequest { Id = articleId },
+        ct));
     }
 
     [HttpPatch("edit")]
