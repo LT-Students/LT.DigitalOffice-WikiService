@@ -61,6 +61,7 @@ namespace LT.DigitalOffice.WikiService.Controllers
         return StatusCode(403);
       }
 
+      
       return Ok(await _mediator.Send(
         new EditSpecificArticleRequest { Id = articleId, Request = request },
         ct));
