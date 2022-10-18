@@ -1,3 +1,5 @@
+using DigitalOffice.Kernel.Behaviours;
+using FluentValidation;
 using HealthChecks.UI.Client;
 using LT.DigitalOffice.Kernel.BrokerSupport.Configurations;
 using LT.DigitalOffice.Kernel.BrokerSupport.Extensions;
@@ -51,7 +53,7 @@ namespace LT.DigitalOffice.WikiService
         .GetSection(BaseRabbitMqConfig.SectionName)
         .Get<RabbitMqConfig>();
 
-      Version = "1.0.0.0";
+      Version = "1.0.0.1";
       Description = "WikiService is an API that intended to work with informational articles.";
       StartTime = DateTime.UtcNow;
       ApiName = $"LT Digital Office - {_serviceInfoConfig.Name}";
@@ -99,6 +101,9 @@ namespace LT.DigitalOffice.WikiService
           options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
         })
         .AddNewtonsoftJson();
+
+      services.AddValidatorsFromAssembly(typeof(AssemblyMarker).Assembly);
+      services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationPipelineBehaviour<,>));
 
       ConfigureMassTransit(services);
     }

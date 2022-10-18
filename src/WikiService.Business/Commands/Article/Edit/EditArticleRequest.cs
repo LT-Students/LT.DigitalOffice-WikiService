@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace LT.DigitalOffice.WikiService.Models.Dto.Requests.Article
+namespace LT.DigitalOffice.WikiService.Business.Commands.Article.Edit
 {
-  public class EditArticleRequest
+  public record EditArticleRequest
   {
     public string Name;
     public string Content;

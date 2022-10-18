@@ -1,9 +1,8 @@
 ﻿using FluentValidation;
 using LT.DigitalOffice.Kernel.Validators;
+using LT.DigitalOffice.WikiService.Business.Commands.Article.Edit.Interfaces;
 using LT.DigitalOffice.WikiService.Data.Interfaces;
 using LT.DigitalOffice.WikiService.Models.Db;
-using LT.DigitalOffice.WikiService.Models.Dto.Requests.Article;
-using LT.DigitalOffice.WikiService.Validation.Article.Interfaces;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.JsonPatch.Operations;
 using System;
@@ -11,7 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace LT.DigitalOffice.WikiService.Validation.Article
+namespace LT.DigitalOffice.WikiService.Business.Commands.Article.Edit
 {
   public class EditArticleRequestValidator : ExtendedEditRequestValidator<DbArticle, EditArticleRequest>, IEditArticleRequestValidator
   {

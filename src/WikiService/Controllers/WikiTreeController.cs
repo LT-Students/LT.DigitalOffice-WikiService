@@ -1,8 +1,6 @@
 ﻿using LT.DigitalOffice.WikiService.Business.Commands.Wiki;
-using LT.DigitalOffice.WikiService.Models.Dto.Models;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
