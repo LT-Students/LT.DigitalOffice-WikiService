@@ -37,7 +37,7 @@ namespace LT.DigitalOffice.WikiService.Controllers
         return StatusCode(403);
       }
 
-      return Created("/article", await _mediator.Send(request, ct));
+      return Created("/articles", await _mediator.Send(request, ct));
     }
 
     [HttpGet("get")]
