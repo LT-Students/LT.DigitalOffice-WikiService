@@ -34,6 +34,16 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Article.Edit
       return result;
     }
 
+    private async Task<bool> EditAsync(DbArticle dbArticle, JsonPatchDocument<DbArticle> request)
+    {
+      request.ApplyTo(dbArticle);
+      dbArticle.ModifiedBy = _httpContextAccessor.HttpContext.GetUserId();
+      dbArticle.ModifiedAtUtc = DateTime.UtcNow;
+      await _provider.SaveAsync();
+
+      return true;
+    }
+
     public EditArticleHandler(
        IEditArticleRequestValidator validator,
        IDataProvider provider,
@@ -55,14 +65,7 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Article.Edit
         throw new BadRequestException(validationResult.Errors.Select(x => x.ErrorMessage).ToList());
       }
 
-      JsonPatchDocument<DbArticle> article = Map(request.Request);
-
-      article.ApplyTo(dbArticle);
-      dbArticle.ModifiedBy = _httpContextAccessor.HttpContext.GetUserId();
-      dbArticle.ModifiedAtUtc = DateTime.UtcNow;
-      await _provider.SaveAsync();
-
-      return true;
+      return await EditAsync(dbArticle, Map(request.Request));
     }
   }
 }
