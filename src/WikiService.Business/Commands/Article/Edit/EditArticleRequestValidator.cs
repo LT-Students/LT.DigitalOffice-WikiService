@@ -47,7 +47,7 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Article.Edit
         new()
         {
           { x => !string.IsNullOrWhiteSpace(x.value?.ToString()), "Name can't be empty." },
-          { x => x.value?.ToString().Trim().Length < 151, "Max lenght of article name is 150 symbols." },
+          { x => x.value?.ToString().Trim().Length < 101, "Max lenght of article name is 100 symbols." },
         },
         CascadeMode.Stop);
 

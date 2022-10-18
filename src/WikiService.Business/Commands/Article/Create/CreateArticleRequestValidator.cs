@@ -15,7 +15,7 @@ namespace LT.DigitalOffice.WikiService.Validation.Article
         .WithMessage("This rubric id does not exist.");
 
       RuleFor(article => article.Name)
-        .MaximumLength(150)
+        .MaximumLength(100)
         .WithMessage("Article name is too long.");
 
       RuleFor(article => article)
