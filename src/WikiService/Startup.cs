@@ -1,3 +1,5 @@
+using DigitalOffice.Kernel.Behaviours;
+using FluentValidation;
 using HealthChecks.UI.Client;
 using LT.DigitalOffice.Kernel.BrokerSupport.Configurations;
 using LT.DigitalOffice.Kernel.BrokerSupport.Extensions;
@@ -99,6 +101,9 @@ namespace LT.DigitalOffice.WikiService
           options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
         })
         .AddNewtonsoftJson();
+
+      services.AddValidatorsFromAssembly(typeof(AssemblyMarker).Assembly);
+      services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationPipelineBehaviour<,>));
 
       ConfigureMassTransit(services);
     }

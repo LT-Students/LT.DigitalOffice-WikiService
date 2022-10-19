@@ -1,6 +1,4 @@
-﻿using LT.DigitalOffice.Kernel.Responses;
-using LT.DigitalOffice.WikiService.Data.Provider.MsSql.Ef;
-using LT.DigitalOffice.WikiService.Models.Dto.Models;
+﻿using LT.DigitalOffice.WikiService.Data.Provider.MsSql.Ef;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;

@@ -1,11 +1,12 @@
 ﻿using LT.DigitalOffice.WikiService.Models.Dto.Models;
+using MediatR;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace LT.DigitalOffice.WikiService.Models.Dto.Requests.Article
 {
-  public record CreateArticleRequest
+  public record CreateArticleRequest : IRequest<Guid?>
   {
     [Required]
     public string Name { get; set; }

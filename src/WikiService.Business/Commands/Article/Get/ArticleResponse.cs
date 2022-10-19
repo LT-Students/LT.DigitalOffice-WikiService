@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace LT.DigitalOffice.WikiService.Models.Dto.Responses.Article
+namespace LT.DigitalOffice.WikiService.Business.Commands.Article.Get
 {
   public record ArticleResponse
   {

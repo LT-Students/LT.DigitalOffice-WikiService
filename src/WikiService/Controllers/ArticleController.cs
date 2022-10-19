@@ -1,11 +1,14 @@
-﻿using System;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using LT.DigitalOffice.Kernel.Responses;
-using LT.DigitalOffice.WikiService.Business.Commands.Article.Interfaces;
+﻿using LT.DigitalOffice.Kernel.BrokerSupport.AccessValidatorEngine.Interfaces;
+using LT.DigitalOffice.Kernel.Constants;
+using LT.DigitalOffice.WikiService.Business.Commands.Article.Edit;
+using LT.DigitalOffice.WikiService.Business.Commands.Article.Get;
 using LT.DigitalOffice.WikiService.Models.Dto.Requests.Article;
-using LT.DigitalOffice.WikiService.Models.Dto.Responses.Article;
+using MediatR;
 using Microsoft.AspNetCore.JsonPatch;
+using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace LT.DigitalOffice.WikiService.Controllers
 {
@@ -13,29 +16,58 @@ namespace LT.DigitalOffice.WikiService.Controllers
   [ApiController]
   public class ArticleController : ControllerBase
   {
-    [HttpPost("create")]
-    public async Task<OperationResultResponse<Guid?>> CreateAsync(
-      [FromServices] ICreateArticleCommand command,
-      [FromBody] CreateArticleRequest request)
+    private readonly IMediator _mediator;
+    private readonly IAccessValidator _accessValidator;
+
+    public ArticleController(
+      IMediator mediator,
+      IAccessValidator accessValidator)
     {
-      return await command.ExecuteAsync(request);
+      _mediator = mediator;
+      _accessValidator = accessValidator;
+    }
+
+    [HttpPost("create")]
+    public async Task<IActionResult> CreateAsync(
+      [FromBody] CreateArticleRequest request,
+      CancellationToken ct)
+    {
+      if (!await _accessValidator.HasRightsAsync(Rights.AddEditRemoveWiki))
+      {
+        return StatusCode(403);
+      }
+
+      return Created("/articles", await _mediator.Send(request, ct));
     }
 
     [HttpGet("get")]
-    public async Task<OperationResultResponse<ArticleResponse>> GetAsync(
-      [FromServices] IGetArticleCommand command,
-      [FromQuery] Guid articleId)
+    public async Task<IActionResult> GetAsync(
+      [FromQuery] Guid articleId,
+      CancellationToken ct)
     {
-      return await command.ExecuteAsync(articleId);
+      ArticleResponse result = await _mediator.Send(
+        new GetArticleRequest { Id = articleId },
+        ct);
+
+      return result is null
+        ? StatusCode(404)
+        : Ok(result);
     }
 
     [HttpPatch("edit")]
-    public async Task<OperationResultResponse<bool>> EditAsync(
-      [FromServices] IEditArticleCommand command,
+    public async Task<IActionResult> EditAsync(
       [FromQuery] Guid articleId,
-      [FromBody] JsonPatchDocument<EditArticleRequest> request)
+      [FromBody] JsonPatchDocument<EditArticleRequest> request,
+      CancellationToken ct)
     {
-      return await command.ExecuteAsync(articleId, request);
+      if (!await _accessValidator.HasRightsAsync(Rights.AddEditRemoveWiki))
+      {
+        return StatusCode(403);
+      }
+      
+      return Ok(await _mediator.Send(
+        new EditSpecificArticleRequest { Id = articleId, Request = request },
+        ct));
     }
   }
 }
