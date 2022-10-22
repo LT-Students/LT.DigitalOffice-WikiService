@@ -1,9 +1,8 @@
 ﻿using FluentValidation;
 using LT.DigitalOffice.Kernel.Validators;
+using LT.DigitalOffice.WikiService.Business.Commands.Rubric.Interfaces;
 using LT.DigitalOffice.WikiService.Data.Interfaces;
 using LT.DigitalOffice.WikiService.Models.Db;
-using LT.DigitalOffice.WikiService.Models.Dto.Requests.Rubric;
-using LT.DigitalOffice.WikiService.Validation.Rubric.Interfaces;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.JsonPatch.Operations;
 using System;
@@ -11,7 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace LT.DigitalOffice.WikiService.Validation.Rubric
+namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric
 {
   public class EditRubricRequestValidator : ExtendedEditRequestValidator<DbRubric, EditRubricRequest>, IEditRubricRequestValidator
   {
@@ -52,7 +51,7 @@ namespace LT.DigitalOffice.WikiService.Validation.Rubric
             "Name must not be empty."
           },
           {
-            x => x.value.ToString().Trim().Length <= 150,
+            x => x.value.ToString().Trim().Length < 101,
             "Name is too long."
           }
         }, CascadeMode.Stop);

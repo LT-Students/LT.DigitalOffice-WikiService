@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace LT.DigitalOffice.WikiService.Models.Dto.Requests.Rubric
+namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric
 {
   public class EditRubricRequest
   {

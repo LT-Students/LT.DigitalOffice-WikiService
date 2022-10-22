@@ -1,11 +1,9 @@
 ﻿using FluentValidation;
 using LT.DigitalOffice.WikiService.Data.Interfaces;
-using LT.DigitalOffice.WikiService.Models.Dto.Requests.Rubric;
-using LT.DigitalOffice.WikiService.Validation.Rubric.Interfaces;
 
-namespace LT.DigitalOffice.WikiService.Validation.Rubric
+namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric.Create
 {
-  public class CreateRubricRequestValidator : AbstractValidator<CreateRubricRequest>, ICreateRubricRequestValidator
+  public class CreateRubricRequestValidator : AbstractValidator<CreateRubricRequest>
   {
     public CreateRubricRequestValidator(
       IRubricRepository rubricRepository)
@@ -13,7 +11,7 @@ namespace LT.DigitalOffice.WikiService.Validation.Rubric
       CascadeMode = CascadeMode.Stop;
 
       RuleFor(rubric => rubric.Name)
-        .MaximumLength(150)
+        .MaximumLength(101)
         .WithMessage("Rubric name is too long.");
 
       When(rubric => rubric.ParentId.HasValue, () =>
