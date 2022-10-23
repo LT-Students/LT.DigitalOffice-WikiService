@@ -1,13 +1,29 @@
 ﻿using FluentValidation;
-using LT.DigitalOffice.WikiService.Data.Interfaces;
+using LT.DigitalOffice.WikiService.Data.Provider;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Threading.Tasks;
 
 namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric.Create
 {
   public class CreateRubricRequestValidator : AbstractValidator<CreateRubricRequest>
   {
-    public CreateRubricRequestValidator(
-      IRubricRepository rubricRepository)
+    private readonly IDataProvider _provider;
+
+    private async Task<bool> DoesExistAsync(Guid rubricId)
     {
+      return await _provider.Rubrics.AnyAsync(x => x.Id == rubricId);
+    }
+
+    private async Task<bool> DoesRubricNameExistAsync(Guid? rubricParentId, string nameRubric)
+    {
+      return await _provider.Rubrics.AnyAsync(p => p.ParentId == rubricParentId && p.Name.ToLower() == nameRubric.ToLower());
+    }
+
+    public CreateRubricRequestValidator(
+      IDataProvider provider)
+    {
+      _provider = provider;
       CascadeMode = CascadeMode.Stop;
 
       RuleFor(rubric => rubric.Name)
@@ -19,12 +35,12 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric.Create
         RuleFor(request => request.ParentId)
           .NotEmpty()
           .WithMessage("ParentId must not be empty.")
-          .MustAsync(async (parentId, _) => await rubricRepository.DoesExistAsync(parentId.Value))
+          .MustAsync(async (parentId, _) => await DoesExistAsync(parentId.Value))
           .WithMessage("This rubric id doesn't exist.");
       });
 
       RuleFor(request => request)
-        .MustAsync(async (request, _) => !await rubricRepository.DoesRubricNameExistAsync(request.ParentId, request.Name))
+        .MustAsync(async (request, _) => !await DoesRubricNameExistAsync(request.ParentId, request.Name))
         .WithMessage("This rubric name already exists.");
     }
   }

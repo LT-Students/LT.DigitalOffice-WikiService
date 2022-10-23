@@ -1,10 +1,11 @@
 ﻿using FluentValidation;
 using LT.DigitalOffice.Kernel.Validators;
 using LT.DigitalOffice.WikiService.Business.Commands.Rubric.Interfaces;
-using LT.DigitalOffice.WikiService.Data.Interfaces;
+using LT.DigitalOffice.WikiService.Data.Provider;
 using LT.DigitalOffice.WikiService.Models.Db;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.JsonPatch.Operations;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +15,17 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric
 {
   public class EditRubricRequestValidator : ExtendedEditRequestValidator<DbRubric, EditRubricRequest>, IEditRubricRequestValidator
   {
-    private readonly IRubricRepository _rubricRepository;
+    private readonly IDataProvider _provider;
+
+    private async Task<bool> DoesExistAsync(Guid rubricId)
+    {
+      return await _provider.Rubrics.AnyAsync(x => x.Id == rubricId);
+    }
+
+    private async Task<bool> DoesRubricNameExistAsync(Guid? rubricParentId, string nameRubric)
+    {
+      return await _provider.Rubrics.AnyAsync(p => p.ParentId == rubricParentId && p.Name.ToLower() == nameRubric.ToLower());
+    }
 
     private async Task HandleInternalPropertyValidationAsync(
       Operation<EditRubricRequest> requestedOperation,
@@ -89,7 +100,7 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric
               }
 
               return Guid.TryParse(x.value.ToString(), out Guid parentId)
-                ? await _rubricRepository.DoesExistAsync(parentId)
+                ? await DoesExistAsync(parentId)
                 : false;
             },
             "Parent id doesn`t exist."
@@ -100,9 +111,8 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric
     #endregion
 
     public EditRubricRequestValidator(
-      IRubricRepository rubricRepository)
+      IDataProvider provider)
     {
-      _rubricRepository = rubricRepository;
 
       RuleForEach(x => x.Item2.Operations)
         .CustomAsync(async (x, context, _) => await HandleInternalPropertyValidationAsync(x, context));
@@ -142,7 +152,7 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric
 
              return (_currentParentId == x.Item1.ParentId && _currentRubricName == x.Item1.Name)
               ? true
-              : !await _rubricRepository.DoesRubricNameExistAsync(_currentParentId, _currentRubricName);
+              : !await DoesRubricNameExistAsync(_currentParentId, _currentRubricName);
            })
            .WithMessage("That name already exists.");
         });

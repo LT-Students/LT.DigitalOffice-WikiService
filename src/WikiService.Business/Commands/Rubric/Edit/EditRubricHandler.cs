@@ -22,9 +22,9 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric.Edit
     private readonly IDataProvider _provider;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
-    private Task<DbRubric> GetAsync(Guid rubricId)
+    private Task<DbRubric> GetAsync(Guid rubricId, CancellationToken ct)
     {
-      return _provider.Rubrics.FirstOrDefaultAsync(x => x.Id == rubricId);
+      return _provider.Rubrics.FirstOrDefaultAsync(x => x.Id == rubricId, ct);
     }
 
     private async Task<bool> EditAsync(DbRubric dbRubric, JsonPatchDocument<DbRubric> request)
@@ -72,7 +72,7 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric.Edit
 
     public async Task<bool> Handle(EditSpecificRubricRequest request, CancellationToken ct)
     {
-      DbRubric rubric = await GetAsync(request.Id);
+      DbRubric rubric = await GetAsync(request.Id, ct);
 
       if (rubric is null)
       {

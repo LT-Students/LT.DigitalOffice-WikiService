@@ -1,10 +1,11 @@
 ﻿using FluentValidation;
 using LT.DigitalOffice.Kernel.Validators;
 using LT.DigitalOffice.WikiService.Business.Commands.Article.Edit.Interfaces;
-using LT.DigitalOffice.WikiService.Data.Interfaces;
+using LT.DigitalOffice.WikiService.Data.Provider;
 using LT.DigitalOffice.WikiService.Models.Db;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.JsonPatch.Operations;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,8 +15,17 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Article.Edit
 {
   public class EditArticleRequestValidator : ExtendedEditRequestValidator<DbArticle, EditArticleRequest>, IEditArticleRequestValidator
   {
-    private readonly IArticleRepository _articleRepository;
-    private readonly IRubricRepository _rubricRepository;
+    private readonly IDataProvider _provider;
+
+    private async Task<bool> DoesSameNameExistAsync(Guid rubricId, string articleName)
+    {
+      return await _provider.Articles.AnyAsync(a => a.RubricId == rubricId && a.Name == articleName);
+    }
+
+    private async Task<bool> DoesExistAsync(Guid rubricId)
+    {
+      return await _provider.Rubrics.AnyAsync(x => x.Id == rubricId);
+    }
 
     private async Task HandleInternalPropertyValidationAsync(
       Operation<EditArticleRequest> requestedOperation,
@@ -81,7 +91,7 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Article.Edit
         {
           {
             async x => Guid.TryParse(x.value?.ToString(), out Guid _rubricId)
-              ? await _rubricRepository.DoesExistAsync(_rubricId)
+              ? await DoesExistAsync(_rubricId)
               : false,
             "This rubric id doesn't exist."
           }
@@ -89,10 +99,10 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Article.Edit
       #endregion
     }
 
-    public EditArticleRequestValidator(IArticleRepository articleRepository, IRubricRepository rubricRepository)
+    public EditArticleRequestValidator(
+      IDataProvider provider)
     {
-      _articleRepository = articleRepository;
-      _rubricRepository = rubricRepository;
+      _provider = provider;
 
       RuleForEach(x => x.Item2.Operations)
         .CustomAsync(async (x, context, _) => await HandleInternalPropertyValidationAsync(x, context));
@@ -121,7 +131,7 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Article.Edit
 
              return (_currentRubricId == x.Item1.RubricId && _currentArticleName == x.Item1.Name)
               ? true
-              : !await _articleRepository.DoesSameNameExistAsync(_currentRubricId, _currentArticleName);
+              : !await DoesSameNameExistAsync(_currentRubricId, _currentArticleName);
            })
            .WithMessage("That article name already exists in this rubric.");
         });

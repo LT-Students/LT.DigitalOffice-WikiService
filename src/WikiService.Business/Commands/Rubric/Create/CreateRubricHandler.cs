@@ -14,14 +14,14 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric.Create
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IDataProvider _provider;
 
-    private async Task<Guid?> CreateAsync(DbRubric dbRubric)
+    private async Task<Guid?> CreateAsync(DbRubric dbRubric, CancellationToken ct)
     {
       if (dbRubric is null)
       {
         return null;
       }
 
-      _provider.Rubrics.Add(dbRubric);
+      await _provider.Rubrics.AddAsync(dbRubric, ct);
       await _provider.SaveAsync();
 
       return dbRubric.Id;
@@ -53,9 +53,9 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric.Create
       _provider = provider;
     }
 
-    public async Task<Guid?> Handle(CreateRubricRequest request, CancellationToken cancellationToken)
+    public async Task<Guid?> Handle(CreateRubricRequest request, CancellationToken ct)
     {
-      return await CreateAsync(Map(request));
+      return await CreateAsync(Map(request), ct);
     }
   }
 }
