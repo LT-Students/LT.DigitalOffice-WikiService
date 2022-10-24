@@ -1,11 +1,13 @@
-﻿using LT.DigitalOffice.Kernel.Responses;
-using LT.DigitalOffice.WikiService.Business.Commands.Rubric.Interfaces;
-using LT.DigitalOffice.WikiService.Models.Dto.Models;
-using LT.DigitalOffice.WikiService.Models.Dto.Requests.Rubric;
-using LT.DigitalOffice.WikiService.Models.Dto.Requests.Rubric.Filters;
+﻿using LT.DigitalOffice.Kernel.BrokerSupport.AccessValidatorEngine.Interfaces;
+using LT.DigitalOffice.Kernel.Constants;
+using LT.DigitalOffice.WikiService.Business.Commands.Rubric;
+using LT.DigitalOffice.WikiService.Business.Commands.Rubric.Create;
+using LT.DigitalOffice.WikiService.Business.Commands.Rubric.Edit;
+using MediatR;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace LT.DigitalOffice.WikiService.Controllers
@@ -14,29 +16,44 @@ namespace LT.DigitalOffice.WikiService.Controllers
   [ApiController]
   public class RubricController : ControllerBase
   {
-    [HttpPost("create")]
-    public async Task<OperationResultResponse<Guid?>> CreateAsync(
-      [FromServices] ICreateRubricCommand command,
-      [FromBody] CreateRubricRequest request)
+    private readonly IMediator _mediator;
+    private readonly IAccessValidator _accessValidator;
+
+    public RubricController(
+      IMediator mediator,
+      IAccessValidator accessValidator)
     {
-      return await command.ExecuteAsync(request);
+      _mediator = mediator;
+      _accessValidator = accessValidator;
     }
 
-    [HttpGet("find")]
-    public async Task<FindResultResponse<RubricInfo>> FindAsync(
-      [FromServices] IFindRubricCommand command,
-      [FromQuery] FindRubricFilter filter)
+    [HttpPost("create")]
+    public async Task<IActionResult> CreateAsync(
+      [FromBody] CreateRubricRequest request,
+      CancellationToken ct)
     {
-      return await command.ExecuteAsync(filter);
+      if (!await _accessValidator.HasRightsAsync(Rights.AddEditRemoveWiki))
+      {
+        return StatusCode(403);
+      }
+
+      return Created("/rubrics", await _mediator.Send(request, ct));
     }
 
     [HttpPatch("edit")]
-    public async Task<OperationResultResponse<bool>> EditAsync(
-      [FromServices] IEditRubricCommand command,
+    public async Task<IActionResult> EditAsync(
       [FromQuery] Guid rubricId,
-      [FromBody] JsonPatchDocument<EditRubricRequest> request)
+      [FromBody] JsonPatchDocument<EditRubricRequest> request,
+      CancellationToken ct)
     {
-      return await command.ExecuteAsync(rubricId, request);
+      if (!await _accessValidator.HasRightsAsync(Rights.AddEditRemoveWiki))
+      {
+        return StatusCode(403);
+      }
+
+      return Ok(await _mediator.Send(
+        new EditSpecificRubricRequest { Id = rubricId, Request = request },
+        ct));
     }
   }
 }
