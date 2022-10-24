@@ -113,6 +113,7 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric
     public EditRubricRequestValidator(
       IDataProvider provider)
     {
+      _provider = provider;
 
       RuleForEach(x => x.Item2.Operations)
         .CustomAsync(async (x, context, _) => await HandleInternalPropertyValidationAsync(x, context));
