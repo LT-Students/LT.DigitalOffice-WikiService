@@ -1,12 +1,8 @@
 ﻿using LT.DigitalOffice.Kernel.BrokerSupport.AccessValidatorEngine.Interfaces;
 using LT.DigitalOffice.Kernel.Constants;
-using LT.DigitalOffice.WikiService.Business.Commands.Article.Edit;
-using LT.DigitalOffice.WikiService.Business.Commands.Article.Get;
-using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using System.Threading;
-using System;
 using MediatR;
 using LT.DigitalOffice.WikiService.Business.Commands.File.Remove;
 using LT.DigitalOffice.WikiService.Business.Commands.File.Find;
@@ -31,14 +27,14 @@ namespace LT.DigitalOffice.WikiService.Controllers
 
     [HttpGet("find")]
     public async Task<IActionResult> GetAsync(
-      [FromBody] FileFindFilter filter,
+      [FromQuery] FileFindFilter filter,
       CancellationToken ct)
     {
       FindResult<FileInfo> result = await _mediator.Send(
         filter,
         ct);
 
-      return result is null
+      return result.Body is null
         ? StatusCode(404)
         : Ok(result);
     }

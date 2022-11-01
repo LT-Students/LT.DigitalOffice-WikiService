@@ -53,7 +53,7 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.File.Remove
 
       if (!response)
       {
-        throw new BadRequestException();
+        throw new BadRequestException("Files can not be removed");
       }
 
       await _publish.RemoveFilesAsync(request.FilesIds);

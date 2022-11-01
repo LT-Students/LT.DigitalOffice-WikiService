@@ -31,8 +31,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WikiService.Models.Db", "sr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WikiService.Models.Dto", "src\WikiService.Models.Dto\WikiService.Models.Dto.csproj", "{9245F19B-A009-456F-83CA-14755CAB1B7E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Models", "..\DigitalOffice-BrokerModels\src\Models\Models.csproj", "{92222D05-DE25-4774-A155-454F6FE7A9AA}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -67,10 +65,6 @@ Global
 		{9245F19B-A009-456F-83CA-14755CAB1B7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9245F19B-A009-456F-83CA-14755CAB1B7E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9245F19B-A009-456F-83CA-14755CAB1B7E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{92222D05-DE25-4774-A155-454F6FE7A9AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{92222D05-DE25-4774-A155-454F6FE7A9AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{92222D05-DE25-4774-A155-454F6FE7A9AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{92222D05-DE25-4774-A155-454F6FE7A9AA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
