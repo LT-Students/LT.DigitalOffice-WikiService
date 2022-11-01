@@ -1,7 +1,6 @@
 using DigitalOffice.Kernel.Behaviours;
 using FluentValidation;
 using HealthChecks.UI.Client;
-using LT.DigitalOffice.Kernel.BrokerSupport.Broker.Consumer;
 using LT.DigitalOffice.Kernel.BrokerSupport.Configurations;
 using LT.DigitalOffice.Kernel.BrokerSupport.Extensions;
 using LT.DigitalOffice.Kernel.BrokerSupport.Helpers;

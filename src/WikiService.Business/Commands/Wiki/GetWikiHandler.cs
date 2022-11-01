@@ -37,7 +37,12 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Wiki
               Name = x.Name,
               IsActive = x.IsActive,
               ParentId = x.ParentId,
-              ArticlesNames = x.Articles.Select(article => article.Name).ToList()
+              Articles = x.Articles.Select(article => new ArticleData
+              {
+                Id = article.Id,
+                Name = article.Name,
+                isActive = article.IsActive
+              }).ToList()
             }).ToListAsync();
 
         foreach (RubricData rubric in rubrics)
