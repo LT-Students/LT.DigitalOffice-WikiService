@@ -5,6 +5,8 @@
 	<ItemGroup>
 		<ProjectReference Include="..\WikiService.Broker\WikiService.Broker.csproj" />
 		<ProjectReference Include="..\WikiService.Business\WikiService.Business.csproj" />
+		<ProjectReference Include="..\WikiService.Data.Provider.MsSql.Ef\WikiService.Data.Provider.MsSql.Ef.csproj" />
+		<ProjectReference Include="..\WikiService.Models.Dto\WikiService.Models.Dto.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

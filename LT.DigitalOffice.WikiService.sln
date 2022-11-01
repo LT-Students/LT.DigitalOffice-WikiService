@@ -21,8 +21,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{0898ED9A-E
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WikiService.Business", "src\WikiService.Business\WikiService.Business.csproj", "{85DD4F1A-BFD3-4E9A-9B0A-7AEC0BEC7822}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WikiService.Data", "src\WikiService.Data\WikiService.Data.csproj", "{546BD28E-C84A-42FC-BB87-AA089177164E}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WikiService.Broker", "src\WikiService.Broker\WikiService.Broker.csproj", "{F490355F-9997-4D45-ACCB-16676DDE3371}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WikiService.Data.Provider", "src\WikiService.Data.Provider\WikiService.Data.Provider.csproj", "{C1A9AD8D-E411-419F-814A-F0C7B7019E27}"
@@ -32,6 +30,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WikiService.Models.Db", "src\WikiService.Models.Db\WikiService.Models.Db.csproj", "{D59F8975-6467-4272-840A-6F50EC104E0F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WikiService.Models.Dto", "src\WikiService.Models.Dto\WikiService.Models.Dto.csproj", "{9245F19B-A009-456F-83CA-14755CAB1B7E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Models", "..\DigitalOffice-BrokerModels\src\Models\Models.csproj", "{92222D05-DE25-4774-A155-454F6FE7A9AA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -47,10 +47,6 @@ Global
 		{85DD4F1A-BFD3-4E9A-9B0A-7AEC0BEC7822}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{85DD4F1A-BFD3-4E9A-9B0A-7AEC0BEC7822}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{85DD4F1A-BFD3-4E9A-9B0A-7AEC0BEC7822}.Release|Any CPU.Build.0 = Release|Any CPU
-		{546BD28E-C84A-42FC-BB87-AA089177164E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{546BD28E-C84A-42FC-BB87-AA089177164E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{546BD28E-C84A-42FC-BB87-AA089177164E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{546BD28E-C84A-42FC-BB87-AA089177164E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F490355F-9997-4D45-ACCB-16676DDE3371}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F490355F-9997-4D45-ACCB-16676DDE3371}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F490355F-9997-4D45-ACCB-16676DDE3371}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -71,6 +67,10 @@ Global
 		{9245F19B-A009-456F-83CA-14755CAB1B7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9245F19B-A009-456F-83CA-14755CAB1B7E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9245F19B-A009-456F-83CA-14755CAB1B7E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{92222D05-DE25-4774-A155-454F6FE7A9AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{92222D05-DE25-4774-A155-454F6FE7A9AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{92222D05-DE25-4774-A155-454F6FE7A9AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{92222D05-DE25-4774-A155-454F6FE7A9AA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -78,7 +78,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{795C0FED-BAC6-4821-A15E-9D463B071E97} = {FFB989C4-6F96-4051-BD1B-6F06FC7ECF2E}
 		{85DD4F1A-BFD3-4E9A-9B0A-7AEC0BEC7822} = {FFB989C4-6F96-4051-BD1B-6F06FC7ECF2E}
-		{546BD28E-C84A-42FC-BB87-AA089177164E} = {FFB989C4-6F96-4051-BD1B-6F06FC7ECF2E}
 		{F490355F-9997-4D45-ACCB-16676DDE3371} = {FFB989C4-6F96-4051-BD1B-6F06FC7ECF2E}
 		{C1A9AD8D-E411-419F-814A-F0C7B7019E27} = {FFB989C4-6F96-4051-BD1B-6F06FC7ECF2E}
 		{65DBB03F-8BD2-43FC-B152-787591F60966} = {FFB989C4-6F96-4051-BD1B-6F06FC7ECF2E}

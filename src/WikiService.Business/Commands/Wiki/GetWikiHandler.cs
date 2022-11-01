@@ -1,4 +1,4 @@
-﻿using LT.DigitalOffice.WikiService.Data.Provider.MsSql.Ef;
+﻿using LT.DigitalOffice.WikiService.Data.Provider;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
@@ -11,11 +11,11 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Wiki
 {
   public class GetWikiHandler : IRequestHandler<GetWikiFilter, List<RubricData>>
   {
-    private readonly WikiServiceDbContext _dbContext;
+    private readonly IDataProvider _dbContext;
     private readonly IMemoryCache _cache;
 
     public GetWikiHandler(
-      WikiServiceDbContext dbContext,
+      IDataProvider dbContext,
       IMemoryCache cache)
     {
       _dbContext = dbContext;

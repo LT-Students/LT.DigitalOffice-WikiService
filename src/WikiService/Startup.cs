@@ -1,6 +1,7 @@
 using DigitalOffice.Kernel.Behaviours;
 using FluentValidation;
 using HealthChecks.UI.Client;
+using LT.DigitalOffice.Kernel.BrokerSupport.Broker.Consumer;
 using LT.DigitalOffice.Kernel.BrokerSupport.Configurations;
 using LT.DigitalOffice.Kernel.BrokerSupport.Extensions;
 using LT.DigitalOffice.Kernel.BrokerSupport.Helpers;
@@ -10,10 +11,14 @@ using LT.DigitalOffice.Kernel.EFSupport.Extensions;
 using LT.DigitalOffice.Kernel.EFSupport.Helpers;
 using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.Kernel.Middlewares.ApiInformation;
+using LT.DigitalOffice.ProjectService.Broker;
+using LT.DigitalOffice.WikiService.Broker.Consumers;
 using LT.DigitalOffice.WikiService.Business;
 using LT.DigitalOffice.WikiService.Data.Provider.MsSql.Ef;
 using LT.DigitalOffice.WikiService.Models.Dto.Configurations;
 using MassTransit;
+using MassTransit.ExtensionsDependencyInjectionIntegration;
+using MassTransit.RabbitMqTransport;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
@@ -143,6 +148,8 @@ namespace LT.DigitalOffice.WikiService
 
       services.AddMassTransit(busConfigurator =>
       {
+        ConfigureConsumers(busConfigurator);
+
         busConfigurator.UsingRabbitMq((context, cfg) =>
         {
           cfg.Host(_rabbitMqConfig.Host, "/", host =>
@@ -150,11 +157,35 @@ namespace LT.DigitalOffice.WikiService
             host.Username(username);
             host.Password(password);
           });
+
+          ConfigureEndpoints(context, cfg, _rabbitMqConfig);
         });
 
         busConfigurator.AddRequestClients(_rabbitMqConfig);
       });
       services.AddMassTransitHostedService();
+    }
+
+    private void ConfigureConsumers(IServiceCollectionBusConfigurator x)
+    {
+      x.AddConsumer<CreateFilesConsumer>();
+      x.AddConsumer<CheckArticlesExistenceConsumer>();
+    }
+
+    private void ConfigureEndpoints(
+      IBusRegistrationContext context,
+      IRabbitMqBusFactoryConfigurator cfg,
+      RabbitMqConfig rabbitMqConfig)
+    {
+      cfg.ReceiveEndpoint(rabbitMqConfig.CreateFilesEndpoint, ep =>
+      {
+        ep.ConfigureConsumer<CreateFilesConsumer>(context);
+      });
+
+      cfg.ReceiveEndpoint(rabbitMqConfig.CheckArticlesExistenceEndpoint, ep =>
+      {
+        ep.ConfigureConsumer<CheckArticlesExistenceConsumer>(context);
+      });
     }
 
     public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory)
