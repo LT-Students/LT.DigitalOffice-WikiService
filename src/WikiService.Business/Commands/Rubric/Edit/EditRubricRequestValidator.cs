@@ -19,7 +19,7 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric
 
     private async Task<bool> DoesExistAsync(Guid rubricId)
     {
-      return await _provider.Rubrics.AnyAsync(x => x.Id == rubricId);
+      return await _provider.Rubrics.AnyAsync(x => x.Id == rubricId && x.IsActive);
     }
 
     private async Task<bool> DoesRubricNameExistAsync(Guid? rubricParentId, string nameRubric)

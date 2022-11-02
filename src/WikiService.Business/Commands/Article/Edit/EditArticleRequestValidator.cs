@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.JsonPatch.Operations;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace LT.DigitalOffice.WikiService.Business.Commands.Article.Edit
@@ -17,14 +16,9 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Article.Edit
   {
     private readonly IDataProvider _provider;
 
-    private async Task<bool> DoesSameNameExistAsync(Guid rubricId, string articleName)
-    {
-      return await _provider.Articles.AnyAsync(a => a.RubricId == rubricId && a.Name == articleName);
-    }
-
     private async Task<bool> DoesExistAsync(Guid rubricId)
     {
-      return await _provider.Rubrics.AnyAsync(x => x.Id == rubricId);
+      return await _provider.Rubrics.AnyAsync(x => x.Id == rubricId && x.IsActive);
     }
 
     private async Task HandleInternalPropertyValidationAsync(
@@ -106,35 +100,6 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Article.Edit
 
       RuleForEach(x => x.Item2.Operations)
         .CustomAsync(async (x, context, _) => await HandleInternalPropertyValidationAsync(x, context));
-
-      When(x => x.Item2.Operations.Any(o =>
-        (o.path.EndsWith(nameof(EditArticleRequest.RubricId), StringComparison.OrdinalIgnoreCase))
-        || (o.path.EndsWith(nameof(EditArticleRequest.Name), StringComparison.OrdinalIgnoreCase))),
-        () =>
-        {
-          RuleFor(x => x)
-           .MustAsync(async (x, _) =>
-           {
-             Guid _currentRubricId = x.Item1.RubricId;
-             string _currentArticleName = x.Item1.Name;
-
-             foreach (Operation<EditArticleRequest> item in x.Item2.Operations)
-             {
-               _currentRubricId = item.path.EndsWith(nameof(EditArticleRequest.RubricId), StringComparison.OrdinalIgnoreCase)
-                 ? Guid.TryParse(item.value?.ToString(), out Guid _rubricIdParseResult) ? _rubricIdParseResult : _currentRubricId
-                 : _currentRubricId;
-
-               _currentArticleName = item.path.EndsWith(nameof(EditArticleRequest.Name), StringComparison.OrdinalIgnoreCase)
-                ? item.value?.ToString()
-                : _currentArticleName;
-             }
-
-             return (_currentRubricId == x.Item1.RubricId && _currentArticleName == x.Item1.Name)
-              ? true
-              : !await DoesSameNameExistAsync(_currentRubricId, _currentArticleName);
-           })
-           .WithMessage("That article name already exists in this rubric.");
-        });
     }
   }
 }
