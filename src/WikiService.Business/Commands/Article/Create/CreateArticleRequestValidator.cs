@@ -23,7 +23,7 @@ namespace LT.DigitalOffice.WikiService.Validation.Article
 
       RuleFor(article => article.RubricId)
         .MustAsync(async (rubricId, _) => await DoesExistAsync(rubricId))
-        .WithMessage("This rubric id does not exist.");
+        .WithMessage("This rubric does not exist or is not active.");
 
       RuleFor(article => article.Name)
         .MaximumLength(210)

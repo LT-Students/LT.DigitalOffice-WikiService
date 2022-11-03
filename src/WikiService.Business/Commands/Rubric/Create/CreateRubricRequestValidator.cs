@@ -15,11 +15,6 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric.Create
       return await _provider.Rubrics.AnyAsync(x => x.Id == rubricId && x.IsActive);
     }
 
-    private async Task<bool> DoesRubricNameExistAsync(Guid? rubricParentId, string nameRubric)
-    {
-      return await _provider.Rubrics.AnyAsync(p => p.ParentId == rubricParentId && p.Name.ToLower() == nameRubric.ToLower());
-    }
-
     public CreateRubricRequestValidator(
       IDataProvider provider)
     {
@@ -36,12 +31,8 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric.Create
           .NotEmpty()
           .WithMessage("ParentId must not be empty.")
           .MustAsync(async (parentId, _) => await DoesExistAsync(parentId.Value))
-          .WithMessage("This rubric id doesn't exist.");
+          .WithMessage("This rubric doesn't exist or is not active.");
       });
-
-      RuleFor(request => request)
-        .MustAsync(async (request, _) => !await DoesRubricNameExistAsync(request.ParentId, request.Name))
-        .WithMessage("This rubric name already exists.");
     }
   }
 }

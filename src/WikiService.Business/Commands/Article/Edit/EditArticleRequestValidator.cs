@@ -18,7 +18,7 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Article.Edit
 
     private async Task<bool> DoesExistAsync(Guid rubricId)
     {
-      return await _provider.Rubrics.AnyAsync(x => x.Id == rubricId && x.IsActive);
+      return await _provider.Rubrics.AnyAsync(x => x.Id == rubricId);
     }
 
     private async Task HandleInternalPropertyValidationAsync(
@@ -73,7 +73,7 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Article.Edit
         x => x == OperationType.Replace,
         new()
         {
-          { x => bool.TryParse(x.value?.ToString(), out bool _), "Incorrect format of IsActive." },
+          { x => bool.TryParse(x.value?.ToString(), out bool _), "Incorrect format of IsActive." }
         });
       #endregion
 
@@ -87,7 +87,7 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Article.Edit
             async x => Guid.TryParse(x.value?.ToString(), out Guid _rubricId)
               ? await DoesExistAsync(_rubricId)
               : false,
-            "This rubric id doesn't exist."
+            "This rubric doesn't exist."
           }
         });
       #endregion

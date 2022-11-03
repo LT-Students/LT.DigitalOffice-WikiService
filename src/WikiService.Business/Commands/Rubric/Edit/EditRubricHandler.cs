@@ -28,7 +28,7 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric.Edit
       return _provider.Rubrics.FirstOrDefaultAsync(x => x.Id == rubricId, ct);
     }
 
-    private async Task DisActivateAsync(Guid rubricId)
+    private async Task ChangeActivationAsync(Guid rubricId, bool isActivate)
     {
       List<DbRubric> rubrics = await _provider.Rubrics.Where(rubric => rubric.ParentId == rubricId).ToListAsync();
 
@@ -37,12 +37,12 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric.Edit
         List<DbArticle> articles = await _provider.Articles.Where(article => article.RubricId == rubric.Id).ToListAsync();
         foreach (DbArticle article in articles)
         {
-          article.IsActive = false;
+          article.IsActive = isActivate;
         }
 
-        rubric.IsActive = false;
+        rubric.IsActive = isActivate;
 
-        await DisActivateAsync(rubric.Id);
+        await ChangeActivationAsync(rubric.Id, isActivate);
       }
     }
 
@@ -53,20 +53,29 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric.Edit
         return false;
       }
 
+      Guid? rubricId = dbRubric.ParentId;
       bool isAtive = dbRubric.IsActive;
       request.ApplyTo(dbRubric);
+
+      if ((rubricId != dbRubric.ParentId || isAtive != dbRubric.IsActive)
+        && dbRubric.IsActive
+        && !(await _provider.Rubrics.FirstOrDefaultAsync(rubric => rubric.Id == dbRubric.ParentId)).IsActive)
+      {
+        throw new BadRequestException("Parent rubric is not active.");
+      }
+
       dbRubric.ModifiedBy = _httpContextAccessor.HttpContext.GetUserId();
       dbRubric.ModifiedAtUtc = DateTime.UtcNow;
 
-      if (isAtive && dbRubric.IsActive != isAtive)
+      if (dbRubric.IsActive != isAtive)
       {
         List<DbArticle> articles = await _provider.Articles.Where(article => article.RubricId == dbRubric.Id).ToListAsync();
         foreach (DbArticle article in articles)
         {
-          article.IsActive = false;
+          article.IsActive = dbRubric.IsActive;
         }
 
-        await DisActivateAsync(dbRubric.Id);
+        await ChangeActivationAsync(dbRubric.Id, dbRubric.IsActive);
       }
 
       await _provider.SaveAsync();
