@@ -144,6 +144,7 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric
                   _currentIsActive = (bool)item.value;
                 }
               }
+
               if ((_currentParentId != x.Item1.ParentId || _currentIsActive != x.Item1.IsActive)
                 && _currentIsActive
                 && _currentParentId.HasValue

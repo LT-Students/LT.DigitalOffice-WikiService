@@ -116,17 +116,15 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Article.Edit
           RuleFor(x => x)
             .MustAsync(async (x, _) =>
             {
-              Guid? _currentRybricId = x.Item1.RubricId;
+              Guid _currentRybricId = x.Item1.RubricId;
               bool _currentIsActive = x.Item1.IsActive;
 
               foreach (Operation<EditArticleRequest> item in x.Item2.Operations)
               {
                 if (item.path.EndsWith(nameof(EditRubricRequest.ParentId), StringComparison.OrdinalIgnoreCase)
-                  && (Guid.TryParse(item.value.ToString(), out Guid parentId) || item.value is null))
+                  && (Guid.TryParse(item.value.ToString(), out Guid rybricId) || item.value is null))
                 {
-                  _currentRybricId = item.value is null
-                    ? null
-                    : parentId;
+                  _currentRybricId = rybricId;
                 }
                 else if (item.path.EndsWith(nameof(EditRubricRequest.IsActive), StringComparison.OrdinalIgnoreCase)
                   && bool.TryParse(item.value?.ToString(), out bool _))
@@ -134,10 +132,10 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Article.Edit
                   _currentIsActive = (bool)item.value;
                 }
               }
+
               if ((_currentRybricId != x.Item1.RubricId || _currentIsActive != x.Item1.IsActive)
                 && _currentIsActive
-                && _currentRybricId.HasValue
-                && !await DoesRubricIsActiveAsync(_currentRybricId.Value))
+                && !await DoesRubricIsActiveAsync(_currentRybricId))
               {
                 return false;
               }
