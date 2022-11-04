@@ -36,16 +36,7 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Article.Edit
 
     private async Task<bool> EditAsync(DbArticle dbArticle, JsonPatchDocument<DbArticle> request)
     {
-      bool isActive = dbArticle.IsActive;
-      Guid rubricId = dbArticle.RubricId;
       request.ApplyTo(dbArticle);
-
-      if ((rubricId != dbArticle.RubricId || isActive != dbArticle.IsActive)
-        && dbArticle.IsActive
-        && !(await _provider.Rubrics.FirstOrDefaultAsync(rubric => rubric.Id == dbArticle.RubricId)).IsActive)
-      {
-        throw new BadRequestException("Rubric is not active.");
-      }
 
       dbArticle.ModifiedBy = _httpContextAccessor.HttpContext.GetUserId();
       dbArticle.ModifiedAtUtc = DateTime.UtcNow;

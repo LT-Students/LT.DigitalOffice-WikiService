@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using LT.DigitalOffice.Kernel.Validators;
 using LT.DigitalOffice.WikiService.Business.Commands.Article.Edit.Interfaces;
+using LT.DigitalOffice.WikiService.Business.Commands.Rubric;
 using LT.DigitalOffice.WikiService.Data.Provider;
 using LT.DigitalOffice.WikiService.Models.Db;
 using Microsoft.AspNetCore.JsonPatch;
@@ -8,6 +9,7 @@ using Microsoft.AspNetCore.JsonPatch.Operations;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace LT.DigitalOffice.WikiService.Business.Commands.Article.Edit
@@ -19,6 +21,11 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Article.Edit
     private async Task<bool> DoesExistAsync(Guid rubricId)
     {
       return await _provider.Rubrics.AnyAsync(x => x.Id == rubricId);
+    }
+
+    private async Task<bool> DoesRubricIsActiveAsync(Guid rubricId)
+    {
+      return await _provider.Rubrics.AnyAsync(x => x.Id == rubricId && x.IsActive);
     }
 
     private async Task HandleInternalPropertyValidationAsync(
@@ -100,6 +107,44 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Article.Edit
 
       RuleForEach(x => x.Item2.Operations)
         .CustomAsync(async (x, context, _) => await HandleInternalPropertyValidationAsync(x, context));
+
+      When(x => x.Item2.Operations.Any(o =>
+        (o.path.EndsWith(nameof(EditRubricRequest.ParentId), StringComparison.OrdinalIgnoreCase))
+          || (o.path.EndsWith(nameof(EditRubricRequest.IsActive), StringComparison.OrdinalIgnoreCase))),
+        () =>
+        {
+          RuleFor(x => x)
+            .MustAsync(async (x, _) =>
+            {
+              Guid? _currentRybricId = x.Item1.RubricId;
+              bool _currentIsActive = x.Item1.IsActive;
+
+              foreach (Operation<EditArticleRequest> item in x.Item2.Operations)
+              {
+                if (item.path.EndsWith(nameof(EditRubricRequest.ParentId), StringComparison.OrdinalIgnoreCase)
+                  && (Guid.TryParse(item.value.ToString(), out Guid parentId) || item.value is null))
+                {
+                  _currentRybricId = item.value is null
+                    ? null
+                    : parentId;
+                }
+                else if (item.path.EndsWith(nameof(EditRubricRequest.IsActive), StringComparison.OrdinalIgnoreCase)
+                  && bool.TryParse(item.value?.ToString(), out bool _))
+                {
+                  _currentIsActive = (bool)item.value;
+                }
+              }
+              if ((_currentRybricId != x.Item1.RubricId || _currentIsActive != x.Item1.IsActive)
+                && _currentIsActive
+                && _currentRybricId.HasValue
+                && !await DoesRubricIsActiveAsync(_currentRybricId.Value))
+              {
+                return false;
+              }
+
+              return true;
+            }).WithMessage("Active article can't be in archive rubric.");
+        });
     }
   }
 }

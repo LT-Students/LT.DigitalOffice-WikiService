@@ -28,7 +28,7 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric.Edit
       return _provider.Rubrics.FirstOrDefaultAsync(x => x.Id == rubricId, ct);
     }
 
-    private async Task ChangeActivationAsync(Guid rubricId, bool isActivate)
+    private async Task ChangeActivityAsync(Guid rubricId, bool isActivate)
     {
       List<DbRubric> rubrics = await _provider.Rubrics.Where(rubric => rubric.ParentId == rubricId).ToListAsync();
 
@@ -42,7 +42,7 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric.Edit
 
         rubric.IsActive = isActivate;
 
-        await ChangeActivationAsync(rubric.Id, isActivate);
+        await ChangeActivityAsync(rubric.Id, isActivate);
       }
     }
 
@@ -53,16 +53,8 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric.Edit
         return false;
       }
 
-      Guid? rubricId = dbRubric.ParentId;
       bool isAtive = dbRubric.IsActive;
       request.ApplyTo(dbRubric);
-
-      if ((rubricId != dbRubric.ParentId || isAtive != dbRubric.IsActive)
-        && dbRubric.IsActive
-        && !(await _provider.Rubrics.FirstOrDefaultAsync(rubric => rubric.Id == dbRubric.ParentId)).IsActive)
-      {
-        throw new BadRequestException("Parent rubric is not active.");
-      }
 
       dbRubric.ModifiedBy = _httpContextAccessor.HttpContext.GetUserId();
       dbRubric.ModifiedAtUtc = DateTime.UtcNow;
@@ -75,7 +67,7 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric.Edit
           article.IsActive = dbRubric.IsActive;
         }
 
-        await ChangeActivationAsync(dbRubric.Id, dbRubric.IsActive);
+        await ChangeActivityAsync(dbRubric.Id, dbRubric.IsActive);
       }
 
       await _provider.SaveAsync();
