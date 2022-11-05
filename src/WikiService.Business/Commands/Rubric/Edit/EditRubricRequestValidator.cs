@@ -139,9 +139,9 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric
                     : parentId;
                 }
                 else if (item.path.EndsWith(nameof(EditRubricRequest.IsActive), StringComparison.OrdinalIgnoreCase)
-                  && bool.TryParse(item.value?.ToString(), out bool _))
+                  && bool.TryParse(item.value?.ToString(), out bool isActive))
                 {
-                  _currentIsActive = (bool)item.value;
+                  _currentIsActive = isActive;
                 }
               }
 
