@@ -8,7 +8,7 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.File.Find
 {
   public record class FileFindFilter : BaseFindFilter, IRequest<FindResult<FileInfo>>
   {
-    [FromQuery(Name = "particleid")]
+    [FromQuery(Name = "articleid")]
     public Guid ArticleId { get; set; }
   }
 }
