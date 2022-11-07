@@ -2,6 +2,7 @@
 using LT.DigitalOffice.Kernel.Exceptions.Models;
 using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.WikiService.Business.Commands.Article.Edit.Interfaces;
+using LT.DigitalOffice.WikiService.Business.Commands.Wiki;
 using LT.DigitalOffice.WikiService.Data.Provider;
 using LT.DigitalOffice.WikiService.Models.Db;
 using MediatR;
@@ -9,6 +10,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.JsonPatch.Operations;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Linq;
 using System.Threading;
@@ -21,6 +23,7 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Article.Edit
     private readonly IDataProvider _provider;
     private readonly IEditArticleRequestValidator _validator;
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IMemoryCache _cache;
 
     private JsonPatchDocument<DbArticle> Map(JsonPatchDocument<EditArticleRequest> request)
     {
@@ -48,11 +51,13 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Article.Edit
     public EditArticleHandler(
        IEditArticleRequestValidator validator,
        IDataProvider provider,
-       IHttpContextAccessor httpContextAccessor)
+       IHttpContextAccessor httpContextAccessor,
+       IMemoryCache cache)
     {
       _validator = validator;
       _provider = provider;
       _httpContextAccessor = httpContextAccessor;
+      _cache = cache;
     }
 
     public async Task<bool> Handle(EditSpecificArticleRequest request, CancellationToken ct)
@@ -65,6 +70,9 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Article.Edit
       {
         throw new BadRequestException(validationResult.Errors.Select(x => x.ErrorMessage).ToList());
       }
+
+      _cache.Remove(CacheKeys.WikiTreeWithDeactivated);
+      _cache.Remove(CacheKeys.WikiTreeWithoutDeactivated);
 
       return await EditAsync(dbArticle, Map(request.Request));
     }
