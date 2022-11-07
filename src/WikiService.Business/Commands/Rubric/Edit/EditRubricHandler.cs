@@ -7,6 +7,7 @@ using FluentValidation.Results;
 using LT.DigitalOffice.Kernel.Exceptions.Models;
 using LT.DigitalOffice.Kernel.Extensions;
 using LT.DigitalOffice.WikiService.Business.Commands.Rubric.Interfaces;
+using LT.DigitalOffice.WikiService.Business.Commands.Wiki;
 using LT.DigitalOffice.WikiService.Data.Provider;
 using LT.DigitalOffice.WikiService.Models.Db;
 using MediatR;
@@ -14,6 +15,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.JsonPatch.Operations;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric.Edit
 {
@@ -22,6 +24,7 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric.Edit
     private readonly IEditRubricRequestValidator _validator;
     private readonly IDataProvider _provider;
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IMemoryCache _cache;
 
     private Task<DbRubric> GetAsync(Guid rubricId, CancellationToken ct)
     {
@@ -95,11 +98,13 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric.Edit
     public EditRubricHandler(
       IEditRubricRequestValidator validator,
       IDataProvider provider,
-      IHttpContextAccessor httpContextAccessor)
+      IHttpContextAccessor httpContextAccessor,
+      IMemoryCache cache)
     {
       _validator = validator;
       _provider = provider;
       _httpContextAccessor = httpContextAccessor;
+      _cache = cache;
     }
 
     public async Task<bool> Handle(EditSpecificRubricRequest request, CancellationToken ct)
@@ -116,6 +121,9 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric.Edit
       {
         throw new BadRequestException(validationResult.Errors.Select(x => x.ErrorMessage).ToList());
       }
+
+      _cache.Remove(CacheKeys.WikiTreeWithDeactivated);
+      _cache.Remove(CacheKeys.WikiTreeWithoutDeactivated);
 
       return await EditAsync(rubric, Map(request.Request));
     }
