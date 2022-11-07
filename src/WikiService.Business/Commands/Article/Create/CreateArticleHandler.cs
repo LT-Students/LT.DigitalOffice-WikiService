@@ -16,8 +16,8 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Article.Create
     private readonly IDataProvider _provider;
 
     public CreateArticleHandler(
-     IHttpContextAccessor httpContextAccessor,
-     IDataProvider provider)
+      IHttpContextAccessor httpContextAccessor,
+      IDataProvider provider)
     {
       _httpContextAccessor = httpContextAccessor;
       _provider = provider;

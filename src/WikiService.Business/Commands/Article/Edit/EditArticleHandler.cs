@@ -37,6 +37,7 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Article.Edit
     private async Task<bool> EditAsync(DbArticle dbArticle, JsonPatchDocument<DbArticle> request)
     {
       request.ApplyTo(dbArticle);
+
       dbArticle.ModifiedBy = _httpContextAccessor.HttpContext.GetUserId();
       dbArticle.ModifiedAtUtc = DateTime.UtcNow;
       await _provider.SaveAsync();

@@ -1,4 +1,4 @@
-﻿using LT.DigitalOffice.WikiService.Data.Provider.MsSql.Ef;
+﻿using LT.DigitalOffice.WikiService.Data.Provider;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
@@ -11,11 +11,11 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Wiki
 {
   public class GetWikiHandler : IRequestHandler<GetWikiFilter, List<RubricData>>
   {
-    private readonly WikiServiceDbContext _dbContext;
+    private readonly IDataProvider _dbContext;
     private readonly IMemoryCache _cache;
 
     public GetWikiHandler(
-      WikiServiceDbContext dbContext,
+      IDataProvider dbContext,
       IMemoryCache cache)
     {
       _dbContext = dbContext;
@@ -37,7 +37,12 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Wiki
               Name = x.Name,
               IsActive = x.IsActive,
               ParentId = x.ParentId,
-              ArticlesNames = x.Articles.Select(article => article.Name).ToList()
+              Articles = x.Articles.Select(article => new ArticleData
+              {
+                Id = article.Id,
+                Name = article.Name,
+                isActive = article.IsActive
+              }).ToList()
             }).ToListAsync();
 
         foreach (RubricData rubric in rubrics)

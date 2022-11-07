@@ -22,9 +22,9 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric
       return await _provider.Rubrics.AnyAsync(x => x.Id == rubricId);
     }
 
-    private async Task<bool> DoesRubricNameExistAsync(Guid? rubricParentId, string nameRubric)
+    private async Task<bool> DoesRubricIsActiveAsync(Guid rubricId)
     {
-      return await _provider.Rubrics.AnyAsync(p => p.ParentId == rubricParentId && p.Name.ToLower() == nameRubric.ToLower());
+      return await _provider.Rubrics.AnyAsync(x => x.Id == rubricId && x.IsActive);
     }
 
     private async Task HandleInternalPropertyValidationAsync(
@@ -120,42 +120,41 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric
 
       When(x => x.Item2.Operations.Any(o =>
         (o.path.EndsWith(nameof(EditRubricRequest.ParentId), StringComparison.OrdinalIgnoreCase))
-        || (o.path.EndsWith(nameof(EditRubricRequest.Name), StringComparison.OrdinalIgnoreCase))),
+          || (o.path.EndsWith(nameof(EditRubricRequest.IsActive), StringComparison.OrdinalIgnoreCase))),
         () =>
         {
           RuleFor(x => x)
-           .MustAsync(async (x, _) =>
-           {
-             Guid? _currentParentId = x.Item1.ParentId;
-             string _currentRubricName = x.Item1.Name;
+            .MustAsync(async (x, _) =>
+            {
+              Guid? _currentParentId = x.Item1.ParentId;
+              bool _currentIsActive = x.Item1.IsActive;
 
-             foreach (Operation<EditRubricRequest> item in x.Item2.Operations)
-             {
-               if (item.path.EndsWith(nameof(EditRubricRequest.ParentId), StringComparison.OrdinalIgnoreCase))
-               {
-                 if (Guid.TryParse(item.value.ToString(), out Guid parentId) || item.value is null)
-                 {
-                   _currentParentId = item.value is null
+              foreach (Operation<EditRubricRequest> item in x.Item2.Operations)
+              {
+                if (item.path.EndsWith(nameof(EditRubricRequest.ParentId), StringComparison.OrdinalIgnoreCase)
+                  && (Guid.TryParse(item.value.ToString(), out Guid parentId) || item.value is null))
+                {
+                  _currentParentId = item.value is null
                     ? null
                     : parentId;
-                 }
-                 else
-                 {
-                   return true;
-                 }
-               }
+                }
+                else if (item.path.EndsWith(nameof(EditRubricRequest.IsActive), StringComparison.OrdinalIgnoreCase)
+                  && bool.TryParse(item.value?.ToString(), out bool isActive))
+                {
+                  _currentIsActive = isActive;
+                }
+              }
 
-               if (item.path.EndsWith(nameof(EditRubricRequest.Name), StringComparison.OrdinalIgnoreCase))
-               {
-                 _currentRubricName = item.value?.ToString();
-               }
-             }
+              if ((_currentParentId != x.Item1.ParentId || _currentIsActive != x.Item1.IsActive)
+                && _currentIsActive
+                && _currentParentId.HasValue
+                && !await DoesRubricIsActiveAsync(_currentParentId.Value))
+              {
+                return false;
+              }
 
-             return (_currentParentId == x.Item1.ParentId && _currentRubricName == x.Item1.Name)
-              ? true
-              : !await DoesRubricNameExistAsync(_currentParentId, _currentRubricName);
-           })
-           .WithMessage("That name already exists.");
+              return true;
+            }).WithMessage("Active sub-rubric can't be in archive rubric.");
         });
     }
   }

@@ -13,7 +13,6 @@ namespace LT.DigitalOffice.WikiService.Models.Db
     public string Name { get; set; }
     public Guid? ParentId { get; set; }
     public bool IsActive { get; set; }
-    public bool HasChild { get; set; } = false;
     public Guid CreatedBy { get; set; }
     public DateTime CreatedAtUtc { get; set; }
     public Guid? ModifiedBy { get; set; }
@@ -40,8 +39,6 @@ namespace LT.DigitalOffice.WikiService.Models.Db
       builder
         .HasMany(r => r.Articles)
         .WithOne(a => a.Rubric);
-
-      builder.Ignore(x => x.HasChild);
     }
   }
 }

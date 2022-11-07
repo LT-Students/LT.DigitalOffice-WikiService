@@ -9,7 +9,7 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Wiki
     public string Name { get; set; }
     public bool IsActive { get; set; }
     public Guid? ParentId { get; set; }
-    public List<string> ArticlesNames { get; set; }
+    public List<ArticleData> Articles { get; set; }
     public List<RubricData> Children { get; set; }
   }
 }

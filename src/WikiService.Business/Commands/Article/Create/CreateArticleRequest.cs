@@ -1,7 +1,5 @@
-﻿using LT.DigitalOffice.WikiService.Models.Dto.Models;
-using MediatR;
+﻿using MediatR;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace LT.DigitalOffice.WikiService.Models.Dto.Requests.Article
@@ -13,6 +11,5 @@ namespace LT.DigitalOffice.WikiService.Models.Dto.Requests.Article
     [Required]
     public string Content { get; set; }
     public Guid RubricId { get; set; }
-    public List<CreateFileRequest> Files { get; set; }
   }
 }

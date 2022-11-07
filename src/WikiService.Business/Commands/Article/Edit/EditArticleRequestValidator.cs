@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using LT.DigitalOffice.Kernel.Validators;
 using LT.DigitalOffice.WikiService.Business.Commands.Article.Edit.Interfaces;
+using LT.DigitalOffice.WikiService.Business.Commands.Rubric;
 using LT.DigitalOffice.WikiService.Data.Provider;
 using LT.DigitalOffice.WikiService.Models.Db;
 using Microsoft.AspNetCore.JsonPatch;
@@ -17,14 +18,14 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Article.Edit
   {
     private readonly IDataProvider _provider;
 
-    private async Task<bool> DoesSameNameExistAsync(Guid rubricId, string articleName)
-    {
-      return await _provider.Articles.AnyAsync(a => a.RubricId == rubricId && a.Name == articleName);
-    }
-
     private async Task<bool> DoesExistAsync(Guid rubricId)
     {
       return await _provider.Rubrics.AnyAsync(x => x.Id == rubricId);
+    }
+
+    private async Task<bool> DoesRubricIsActiveAsync(Guid rubricId)
+    {
+      return await _provider.Rubrics.AnyAsync(x => x.Id == rubricId && x.IsActive);
     }
 
     private async Task HandleInternalPropertyValidationAsync(
@@ -79,7 +80,7 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Article.Edit
         x => x == OperationType.Replace,
         new()
         {
-          { x => bool.TryParse(x.value?.ToString(), out bool _), "Incorrect format of IsActive." },
+          { x => bool.TryParse(x.value?.ToString(), out bool _), "Incorrect format of IsActive." }
         });
       #endregion
 
@@ -93,7 +94,7 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Article.Edit
             async x => Guid.TryParse(x.value?.ToString(), out Guid _rubricId)
               ? await DoesExistAsync(_rubricId)
               : false,
-            "This rubric id doesn't exist."
+            "This rubric doesn't exist."
           }
         });
       #endregion
@@ -108,32 +109,39 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Article.Edit
         .CustomAsync(async (x, context, _) => await HandleInternalPropertyValidationAsync(x, context));
 
       When(x => x.Item2.Operations.Any(o =>
-        (o.path.EndsWith(nameof(EditArticleRequest.RubricId), StringComparison.OrdinalIgnoreCase))
-        || (o.path.EndsWith(nameof(EditArticleRequest.Name), StringComparison.OrdinalIgnoreCase))),
+        (o.path.EndsWith(nameof(EditRubricRequest.ParentId), StringComparison.OrdinalIgnoreCase))
+          || (o.path.EndsWith(nameof(EditRubricRequest.IsActive), StringComparison.OrdinalIgnoreCase))),
         () =>
         {
           RuleFor(x => x)
-           .MustAsync(async (x, _) =>
-           {
-             Guid _currentRubricId = x.Item1.RubricId;
-             string _currentArticleName = x.Item1.Name;
+            .MustAsync(async (x, _) =>
+            {
+              Guid _currentRubricId = x.Item1.RubricId;
+              bool _currentIsActive = x.Item1.IsActive;
 
-             foreach (Operation<EditArticleRequest> item in x.Item2.Operations)
-             {
-               _currentRubricId = item.path.EndsWith(nameof(EditArticleRequest.RubricId), StringComparison.OrdinalIgnoreCase)
-                 ? Guid.TryParse(item.value?.ToString(), out Guid _rubricIdParseResult) ? _rubricIdParseResult : _currentRubricId
-                 : _currentRubricId;
+              foreach (Operation<EditArticleRequest> item in x.Item2.Operations)
+              {
+                if (item.path.EndsWith(nameof(EditRubricRequest.ParentId), StringComparison.OrdinalIgnoreCase)
+                  && Guid.TryParse(item.value.ToString(), out Guid rybricId))
+                {
+                  _currentRubricId = rybricId;
+                }
+                else if (item.path.EndsWith(nameof(EditRubricRequest.IsActive), StringComparison.OrdinalIgnoreCase)
+                  && bool.TryParse(item.value?.ToString(), out bool isActive))
+                {
+                  _currentIsActive = isActive;
+                }
+              }
 
-               _currentArticleName = item.path.EndsWith(nameof(EditArticleRequest.Name), StringComparison.OrdinalIgnoreCase)
-                ? item.value?.ToString()
-                : _currentArticleName;
-             }
+              if ((_currentRubricId != x.Item1.RubricId || _currentIsActive != x.Item1.IsActive)
+                && _currentIsActive
+                && !await DoesRubricIsActiveAsync(_currentRubricId))
+              {
+                return false;
+              }
 
-             return (_currentRubricId == x.Item1.RubricId && _currentArticleName == x.Item1.Name)
-              ? true
-              : !await DoesSameNameExistAsync(_currentRubricId, _currentArticleName);
-           })
-           .WithMessage("That article name already exists in this rubric.");
+              return true;
+            }).WithMessage("Active article can't be in archive rubric.");
         });
     }
   }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -27,6 +28,24 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric.Edit
       return _provider.Rubrics.FirstOrDefaultAsync(x => x.Id == rubricId, ct);
     }
 
+    private async Task ChangeActivityAsync(Guid rubricId, bool isActivate)
+    {
+      List<DbRubric> rubrics = await _provider.Rubrics.Where(rubric => rubric.ParentId == rubricId).ToListAsync();
+
+      foreach (DbRubric rubric in rubrics)
+      {
+        List<DbArticle> articles = await _provider.Articles.Where(article => article.RubricId == rubric.Id).ToListAsync();
+        foreach (DbArticle article in articles)
+        {
+          article.IsActive = isActivate;
+        }
+
+        rubric.IsActive = isActivate;
+
+        await ChangeActivityAsync(rubric.Id, isActivate);
+      }
+    }
+
     private async Task<bool> EditAsync(DbRubric dbRubric, JsonPatchDocument<DbRubric> request)
     {
       if (dbRubric is null || request is null)
@@ -34,9 +53,22 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric.Edit
         return false;
       }
 
+      bool isAtive = dbRubric.IsActive;
       request.ApplyTo(dbRubric);
+
       dbRubric.ModifiedBy = _httpContextAccessor.HttpContext.GetUserId();
       dbRubric.ModifiedAtUtc = DateTime.UtcNow;
+
+      if (dbRubric.IsActive != isAtive)
+      {
+        List<DbArticle> articles = await _provider.Articles.Where(article => article.RubricId == dbRubric.Id).ToListAsync();
+        foreach (DbArticle article in articles)
+        {
+          article.IsActive = dbRubric.IsActive;
+        }
+
+        await ChangeActivityAsync(dbRubric.Id, dbRubric.IsActive);
+      }
 
       await _provider.SaveAsync();
 
