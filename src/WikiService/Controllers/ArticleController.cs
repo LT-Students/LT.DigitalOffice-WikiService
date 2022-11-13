@@ -1,6 +1,7 @@
 ﻿using LT.DigitalOffice.Kernel.BrokerSupport.AccessValidatorEngine.Interfaces;
 using LT.DigitalOffice.Kernel.Constants;
 using LT.DigitalOffice.WikiService.Business.Commands.Article.Edit;
+using LT.DigitalOffice.WikiService.Business.Commands.Article.EditPosition;
 using LT.DigitalOffice.WikiService.Business.Commands.Article.Get;
 using LT.DigitalOffice.WikiService.Models.Dto.Requests.Article;
 using MediatR;
@@ -38,6 +39,19 @@ namespace LT.DigitalOffice.WikiService.Controllers
       }
 
       return Created("/articles", await _mediator.Send(request, ct));
+    }
+
+    [HttpPost("editPosition")]
+    public async Task<IActionResult> EditPositionAsync(
+      [FromBody] EditPositionArticleRequest request,
+      CancellationToken ct)
+    {
+      if (!await _accessValidator.HasRightsAsync(Rights.AddEditRemoveWiki))
+      {
+        return StatusCode(403);
+      }
+
+      return Ok(await _mediator.Send(request, ct));
     }
 
     [HttpGet("get")]

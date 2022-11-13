@@ -14,6 +14,7 @@ namespace LT.DigitalOffice.WikiService.Models.Db
     public string Content { get; set; }
     public bool IsActive { get; set; }
     public Guid RubricId { get; set; }
+    public int Position { get; set; }
     public Guid CreatedBy { get; set; }
     public DateTime CreatedAtUtc { get; set; }
     public Guid? ModifiedBy { get; set; }
