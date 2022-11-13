@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric.Create
 {
-  public class EditPositionRubricRequestValidator : AbstractValidator<CreateRubricRequest>
+  public class CreateRubricRequestValidator : AbstractValidator<CreateRubricRequest>
   {
     private readonly IDataProvider _provider;
 
@@ -15,7 +15,7 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric.Create
       return await _provider.Rubrics.AnyAsync(x => x.Id == rubricId && x.IsActive);
     }
 
-    public EditPositionRubricRequestValidator(
+    public CreateRubricRequestValidator(
       IDataProvider provider)
     {
       _provider = provider;
