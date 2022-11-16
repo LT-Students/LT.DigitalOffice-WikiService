@@ -55,7 +55,6 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric
       AddСorrectOperations(nameof(EditRubricRequest.IsActive), new() { OperationType.Replace });
       AddСorrectOperations(nameof(EditRubricRequest.Position), new() { OperationType.Replace });
 
-
       #endregion
 
       #region Name
@@ -204,8 +203,8 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric
               }
 
               if (parentId != Guid.Empty && position == 0
-              || parentId != Guid.Empty && position > await CountChildrenAsync(parentId)
-              || parentId == Guid.Empty && position > await CountChildrenAsync(x.Item1.ParentId))
+                || parentId != Guid.Empty && position > await CountChildrenAsync(parentId)
+                || parentId == Guid.Empty && position > await CountChildrenAsync(x.Item1.ParentId))
               {
                 return false;
               }
