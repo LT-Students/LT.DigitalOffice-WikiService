@@ -27,6 +27,11 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric
       return await _provider.Rubrics.AnyAsync(x => x.Id == rubricId && x.IsActive);
     }
 
+    private async Task<int> CountChildrenAsync(Guid? parentId)
+    {
+      return await _provider.Rubrics.CountAsync(x => x.ParentId == parentId);
+    }
+
     private async Task HandleInternalPropertyValidationAsync(
       Operation<EditRubricRequest> requestedOperation,
       ValidationContext<(DbRubric, JsonPatchDocument<EditRubricRequest>)> context)
@@ -41,12 +46,15 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric
         {
           nameof(EditRubricRequest.Name),
           nameof(EditRubricRequest.ParentId),
-          nameof(EditRubricRequest.IsActive)
+          nameof(EditRubricRequest.IsActive),
+          nameof(EditRubricRequest.Position)
         });
 
       AddСorrectOperations(nameof(EditRubricRequest.Name), new() { OperationType.Replace });
       AddСorrectOperations(nameof(EditRubricRequest.ParentId), new() { OperationType.Replace });
       AddСorrectOperations(nameof(EditRubricRequest.IsActive), new() { OperationType.Replace });
+      AddСorrectOperations(nameof(EditRubricRequest.Position), new() { OperationType.Replace });
+
 
       #endregion
 
@@ -106,9 +114,24 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric
             "Parent id doesn`t exist."
           }
         });
-    }
 
-    #endregion
+      #endregion
+
+      #region Position
+
+      AddFailureForPropertyIf(
+       nameof(EditRubricRequest.Position),
+       x => x == OperationType.Replace,
+       new()
+       {
+         {
+           x => int.Parse(x.value?.ToString()) > 0,
+           "Position must be greater than 0."
+         },
+       });
+
+      #endregion
+    }
 
     public EditRubricRequestValidator(
       IDataProvider provider)
@@ -119,8 +142,8 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric
         .CustomAsync(async (x, context, _) => await HandleInternalPropertyValidationAsync(x, context));
 
       When(x => x.Item2.Operations.Any(o =>
-        (o.path.EndsWith(nameof(EditRubricRequest.ParentId), StringComparison.OrdinalIgnoreCase))
-          || (o.path.EndsWith(nameof(EditRubricRequest.IsActive), StringComparison.OrdinalIgnoreCase))),
+        o.path.EndsWith(nameof(EditRubricRequest.ParentId), StringComparison.OrdinalIgnoreCase)
+          || o.path.EndsWith(nameof(EditRubricRequest.IsActive), StringComparison.OrdinalIgnoreCase)),
         () =>
         {
           RuleFor(x => x)
@@ -155,6 +178,40 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric
 
               return true;
             }).WithMessage("Active sub-rubric can't be in archive rubric.");
+        });
+
+      When(x => x.Item2.Operations.Any(o =>
+        o.path.EndsWith(nameof(EditRubricRequest.ParentId), StringComparison.OrdinalIgnoreCase)
+          || o.path.EndsWith(nameof(EditRubricRequest.Position), StringComparison.OrdinalIgnoreCase)),
+        () =>
+        {
+          RuleFor(x => x)
+            .MustAsync(async (x, _) =>
+            {
+              int position = 0;
+              Guid parentId = Guid.Empty;
+
+              foreach (Operation<EditRubricRequest> item in x.Item2.Operations)
+              {
+                if (item.path.EndsWith(nameof(EditRubricRequest.ParentId), StringComparison.OrdinalIgnoreCase))
+                {
+                  Guid.TryParse(item.value.ToString(), out parentId);
+                }
+                else if (item.path.EndsWith(nameof(EditRubricRequest.Position), StringComparison.OrdinalIgnoreCase))
+                {
+                  int.TryParse(item.value?.ToString(), out position);
+                }
+              }
+
+              if (parentId != Guid.Empty && position == 0
+              || parentId != Guid.Empty && position > await CountChildrenAsync(parentId)
+              || parentId == Guid.Empty && position > await CountChildrenAsync(x.Item1.ParentId))
+              {
+                return false;
+              }
+
+              return true;
+            }).WithMessage("Position is too big.");
         });
     }
   }

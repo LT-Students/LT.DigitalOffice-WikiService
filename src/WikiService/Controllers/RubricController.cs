@@ -3,7 +3,6 @@ using LT.DigitalOffice.Kernel.Constants;
 using LT.DigitalOffice.WikiService.Business.Commands.Rubric;
 using LT.DigitalOffice.WikiService.Business.Commands.Rubric.Create;
 using LT.DigitalOffice.WikiService.Business.Commands.Rubric.Edit;
-using LT.DigitalOffice.WikiService.Business.Commands.Rubric.EditPosition;
 using MediatR;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
@@ -39,19 +38,6 @@ namespace LT.DigitalOffice.WikiService.Controllers
       }
 
       return Created("/rubrics", await _mediator.Send(request, ct));
-    }
-
-    [HttpPost("editPosition")]
-    public async Task<IActionResult> EditPositionAsync(
-      [FromBody] EditPositionRubricRequest request,
-      CancellationToken ct)
-    {
-      if (!await _accessValidator.HasRightsAsync(Rights.AddEditRemoveWiki))
-      {
-        return StatusCode(403);
-      }
-
-      return Ok(await _mediator.Send(request, ct));
     }
 
     [HttpPatch("edit")]

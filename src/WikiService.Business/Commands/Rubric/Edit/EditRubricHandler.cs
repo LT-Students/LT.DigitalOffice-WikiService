@@ -26,6 +26,107 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric.Edit
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IMemoryCache _cache;
 
+    private Task<ValueTuple<int, Guid>[]> GetPositionsAsync(Guid? parentId)
+    {
+      return _provider.Rubrics
+        .Where(x => x.ParentId == parentId)
+        .Select(x => new ValueTuple<int, Guid>(x.Position, x.Id))
+        .ToArrayAsync();
+    }
+
+    private async Task<bool> EditPositionsAsync(
+      ValueTuple<int, Guid>[] positions,
+      Guid? parentId)
+    {
+      List<DbRubric> rubrics = await _provider.Rubrics.Where(x => x.ParentId == parentId).ToListAsync();
+
+      foreach (DbRubric rubric in rubrics)
+      {
+        int position = positions.FirstOrDefault(x => x.Item2 == rubric.Id).Item1;
+        rubric.Position = position == 0
+          ? rubric.Position
+          : position;
+      }
+
+      return true;
+    }
+
+    private async Task<bool> ChangePositionAsync(Guid id, int position, Guid? parentId)
+    {
+      ValueTuple<int, Guid>[] positions = await GetPositionsAsync(parentId);
+
+      Array.Sort(positions);
+
+      for (int i = 0; i < positions.Length; i++)
+      {
+        if (positions[i].Item2 == id)
+        {
+          if (positions[i].Item1 < position)
+          {
+            int j = i + 1;
+            while (j < positions.Length && positions[j].Item1 <= position)
+            {
+              positions[j].Item1--;
+              j++;
+            }
+          }
+          else
+          {
+            int j = i - 1;
+            while (j >= 0 && positions[j].Item1 >= position)
+            {
+              positions[j].Item1++;
+              j--;
+            }
+          }
+
+          positions[i].Item1 = position;
+          break;
+        }
+      }
+
+      return await EditPositionsAsync(positions, parentId);
+    }
+
+    private async Task<bool> ChangeRubricAsync(Guid id, int position, Guid? parentId, Guid? oldParentId)
+    {
+      ValueTuple<int, Guid>[] positions = await GetPositionsAsync(parentId);
+      ValueTuple<int, Guid>[] oldPositions = await GetPositionsAsync(oldParentId);
+
+      Array.Sort(positions);
+      Array.Sort(oldPositions);
+
+      for (int i = 0; i < oldPositions.Length; i++)
+      {
+        if (oldPositions[i].Item2 == id)
+        {
+          for (int j = i; j < oldPositions.Length - 1; j++)
+          {
+            oldPositions[j].Item1 = oldPositions[j + 1].Item1 - 1;
+            oldPositions[j].Item2 = oldPositions[j + 1].Item2;
+          }
+
+          Array.Clear(oldPositions, oldPositions.Length - 1, 1);
+          break;
+        }
+      }
+
+      for (int i = 0; i < positions.Length; i++)
+      {
+        if (positions[i].Item1 == position)
+        {
+          for (int j = i; j < positions.Length; j++)
+          {
+            oldPositions[j].Item1 = oldPositions[j].Item1 + 1;
+          }
+
+          break;
+        }
+      }
+
+      return await EditPositionsAsync(positions, parentId) && await EditPositionsAsync(oldPositions, oldParentId);
+    }
+
     private Task<DbRubric> GetAsync(Guid rubricId, CancellationToken ct)
     {
       return _provider.Rubrics.FirstOrDefaultAsync(x => x.Id == rubricId, ct);
@@ -56,8 +157,27 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric.Edit
         return false;
       }
 
+      Guid? parentId = dbRubric.ParentId;
+      int position = dbRubric.Position;
       bool isAtive = dbRubric.IsActive;
+
       request.ApplyTo(dbRubric);
+
+      if (parentId != dbRubric.ParentId)
+      {
+        await ChangeRubricAsync(
+          id: dbRubric.Id,
+          position: dbRubric.Position,
+          parentId: dbRubric.ParentId,
+          oldParentId: parentId);
+      }
+      else if (position != dbRubric.Position)
+      {
+        await ChangePositionAsync(
+          id: dbRubric.Id,
+          position: dbRubric.Position,
+          parentId: dbRubric.ParentId);
+      }
 
       dbRubric.ModifiedBy = _httpContextAccessor.HttpContext.GetUserId();
       dbRubric.ModifiedAtUtc = DateTime.UtcNow;
