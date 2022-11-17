@@ -203,8 +203,8 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric
               }
 
               if (parentId != Guid.Empty && position == 0
-                || parentId != Guid.Empty && position > await CountChildrenAsync(parentId)
-                || parentId == Guid.Empty && position > await CountChildrenAsync(x.Item1.ParentId))
+                || parentId != Guid.Empty && position > await CountChildrenAsync(parentId) + 1
+                || parentId == Guid.Empty && position > await CountChildrenAsync(x.Item1.ParentId) + 1)
               {
                 return false;
               }
