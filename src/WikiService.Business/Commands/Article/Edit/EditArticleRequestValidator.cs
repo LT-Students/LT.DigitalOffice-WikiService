@@ -189,7 +189,7 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Article.Edit
 
               if (rubricId != Guid.Empty && position == 0
                 || rubricId != Guid.Empty && position > await CountChildrenAsync(rubricId) + 1
-                || rubricId == Guid.Empty && position > await CountChildrenAsync(x.Item1.RubricId) + 1)
+                || rubricId == Guid.Empty && position > await CountChildrenAsync(x.Item1.RubricId))
               {
                 return false;
               }
