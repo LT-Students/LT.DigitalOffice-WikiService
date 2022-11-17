@@ -27,10 +27,10 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Article.Create
         return null;
       }
 
-      int? position = await _provider.Articles
+      int position = await _provider.Articles
         .Where(x => x.RubricId == dbArticle.RubricId)
-        .MaxAsync(x => (int?)x.Position);
-      dbArticle.Position = !position.HasValue ? 1 : position.Value + 1;
+        .CountAsync();
+      dbArticle.Position = position + 1;
 
       await _provider.Articles.AddAsync(dbArticle, ct);
       await _provider.SaveAsync();

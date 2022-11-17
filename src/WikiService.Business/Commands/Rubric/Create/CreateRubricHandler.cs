@@ -26,10 +26,10 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric.Create
         return null;
       }
 
-      int? position = await _provider.Rubrics
+      int position = await _provider.Rubrics
         .Where(x => x.ParentId == dbRubric.ParentId)
-        .MaxAsync(x => (int?)x.Position);
-      dbRubric.Position = !position.HasValue ? 1 : position.Value + 1;
+        .CountAsync();
+      dbRubric.Position = position + 1;
       
       await _provider.Rubrics.AddAsync(dbRubric, ct);
       await _provider.SaveAsync();

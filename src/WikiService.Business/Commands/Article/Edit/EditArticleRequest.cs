@@ -2,7 +2,7 @@
 
 namespace LT.DigitalOffice.WikiService.Business.Commands.Article.Edit
 {
-  public record EditArticleRequest
+  public class EditArticleRequest
   {
     public string Name { get; set; }
     public string Content { get; set; }

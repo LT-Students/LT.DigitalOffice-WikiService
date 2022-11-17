@@ -20,17 +20,17 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Article.Edit
 
     private async Task<bool> DoesExistAsync(Guid rubricId)
     {
-      return await _provider.Rubrics.AnyAsync(x => x.Id == rubricId);
+      return await _provider.Rubrics.AsNoTracking().AnyAsync(x => x.Id == rubricId);
     }
 
     private async Task<bool> DoesRubricIsActiveAsync(Guid rubricId)
     {
-      return await _provider.Rubrics.AnyAsync(x => x.Id == rubricId && x.IsActive);
+      return await _provider.Rubrics.AsNoTracking().AnyAsync(x => x.Id == rubricId && x.IsActive);
     }
 
     private async Task<int> CountChildrenAsync(Guid? parentId)
     {
-      return await _provider.Rubrics.CountAsync(x => x.ParentId == parentId);
+      return await _provider.Rubrics.AsNoTracking().CountAsync(x => x.ParentId == parentId);
     }
 
     private async Task HandleInternalPropertyValidationAsync(
