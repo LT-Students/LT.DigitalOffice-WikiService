@@ -4,8 +4,10 @@ using LT.DigitalOffice.WikiService.Data.Provider;
 using LT.DigitalOffice.WikiService.Models.Db;
 using MediatR;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -24,6 +26,11 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Rubric.Create
         return null;
       }
 
+      int position = await _provider.Rubrics
+        .Where(x => x.ParentId == dbRubric.ParentId)
+        .CountAsync();
+      dbRubric.Position = position + 1;
+      
       await _provider.Rubrics.AddAsync(dbRubric, ct);
       await _provider.SaveAsync();
 

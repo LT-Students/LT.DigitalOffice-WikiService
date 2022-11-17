@@ -32,6 +32,7 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Article.Get
             Content = article.Content,
             IsActive = article.IsActive,
             RubricId = article.RubricId,
+            Position = article.Position,
             Files = article.Files
               ?.Select(f => f.FileId).ToList(),
           };

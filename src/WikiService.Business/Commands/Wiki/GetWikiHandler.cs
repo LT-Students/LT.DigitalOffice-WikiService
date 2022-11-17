@@ -37,11 +37,13 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Wiki
               Name = x.Name,
               IsActive = x.IsActive,
               ParentId = x.ParentId,
+              Position = x.Position,
               Articles = x.Articles.Select(article => new ArticleData
               {
                 Id = article.Id,
                 Name = article.Name,
-                isActive = article.IsActive
+                IsActive = article.IsActive,
+                Position = article.Position
               }).ToList()
             }).ToListAsync();
 

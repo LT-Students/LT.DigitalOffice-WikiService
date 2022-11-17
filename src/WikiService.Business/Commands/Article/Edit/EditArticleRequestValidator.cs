@@ -20,12 +20,17 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Article.Edit
 
     private async Task<bool> DoesExistAsync(Guid rubricId)
     {
-      return await _provider.Rubrics.AnyAsync(x => x.Id == rubricId);
+      return await _provider.Rubrics.AsNoTracking().AnyAsync(x => x.Id == rubricId);
     }
 
     private async Task<bool> DoesRubricIsActiveAsync(Guid rubricId)
     {
-      return await _provider.Rubrics.AnyAsync(x => x.Id == rubricId && x.IsActive);
+      return await _provider.Rubrics.AsNoTracking().AnyAsync(x => x.Id == rubricId && x.IsActive);
+    }
+
+    private async Task<int> CountChildrenAsync(Guid? parentId)
+    {
+      return await _provider.Rubrics.AsNoTracking().CountAsync(x => x.ParentId == parentId);
     }
 
     private async Task HandleInternalPropertyValidationAsync(
@@ -42,13 +47,15 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Article.Edit
           nameof(EditArticleRequest.Name),
           nameof(EditArticleRequest.Content),
           nameof(EditArticleRequest.IsActive),
-          nameof(EditArticleRequest.RubricId)
+          nameof(EditArticleRequest.RubricId),
+          nameof(EditRubricRequest.Position)
         });
 
       AddСorrectOperations(nameof(EditArticleRequest.Name), new() { OperationType.Replace });
       AddСorrectOperations(nameof(EditArticleRequest.Content), new() { OperationType.Replace });
       AddСorrectOperations(nameof(EditArticleRequest.IsActive), new() { OperationType.Replace });
       AddСorrectOperations(nameof(EditArticleRequest.RubricId), new() { OperationType.Replace });
+      AddСorrectOperations(nameof(EditArticleRequest.Position), new() { OperationType.Replace });
       #endregion
 
       #region Name
@@ -98,6 +105,19 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Article.Edit
           }
         });
       #endregion
+
+      #region Position
+      AddFailureForPropertyIf(
+       nameof(EditRubricRequest.Position),
+       x => x == OperationType.Replace,
+       new()
+       {
+         {
+           x => int.Parse(x.value?.ToString()) > 0,
+           "Position must be greater than 0."
+         },
+       });
+      #endregion
     }
 
     public EditArticleRequestValidator(
@@ -142,6 +162,40 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Article.Edit
 
               return true;
             }).WithMessage("Active article can't be in archive rubric.");
+        });
+
+      When(x => x.Item2.Operations.Any(o =>
+        o.path.EndsWith(nameof(EditRubricRequest.ParentId), StringComparison.OrdinalIgnoreCase)
+          || o.path.EndsWith(nameof(EditRubricRequest.Position), StringComparison.OrdinalIgnoreCase)),
+        () =>
+        {
+          RuleFor(x => x)
+            .MustAsync(async (x, _) =>
+            {
+              int position = 0;
+              Guid rubricId = Guid.Empty;
+
+              foreach (Operation<EditArticleRequest> item in x.Item2.Operations)
+              {
+                if (item.path.EndsWith(nameof(EditRubricRequest.ParentId), StringComparison.OrdinalIgnoreCase))
+                {
+                  Guid.TryParse(item.value.ToString(), out rubricId);
+                }
+                else if (item.path.EndsWith(nameof(EditRubricRequest.Position), StringComparison.OrdinalIgnoreCase))
+                {
+                  int.TryParse(item.value?.ToString(), out position);
+                }
+              }
+
+              if (rubricId != Guid.Empty && position == 0
+                || rubricId != Guid.Empty && position > await CountChildrenAsync(rubricId) + 1
+                || rubricId == Guid.Empty && position > await CountChildrenAsync(x.Item1.RubricId))
+              {
+                return false;
+              }
+
+              return true;
+            }).WithMessage("Position is too big.");
         });
     }
   }

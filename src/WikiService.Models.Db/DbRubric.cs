@@ -13,6 +13,7 @@ namespace LT.DigitalOffice.WikiService.Models.Db
     public string Name { get; set; }
     public Guid? ParentId { get; set; }
     public bool IsActive { get; set; }
+    public int Position { get; set; }
     public Guid CreatedBy { get; set; }
     public DateTime CreatedAtUtc { get; set; }
     public Guid? ModifiedBy { get; set; }
