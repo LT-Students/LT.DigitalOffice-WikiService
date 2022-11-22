@@ -34,10 +34,10 @@ namespace LT.DigitalOffice.WikiService.Broker.Consumers
       if (context.Message.FilesIds is not null && context.Message.FilesIds.Any())
       {
 
-/*        List<DbArticleFile> articleFiles = context.Message.FilesIds.Select(file => Map(file, context.Message.ArticleId)).ToList();
+        List<DbArticleFile> articleFiles = context.Message.FilesIds.Select(file => Map(file, context.Message.ArticleId)).ToList();
 
         await _provider.ArticlesFiles.AddRangeAsync(articleFiles);
-        await _provider.SaveAsync();*/
+        await _provider.SaveAsync();
       }
     }
   }

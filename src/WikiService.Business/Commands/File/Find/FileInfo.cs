@@ -1,5 +1,4 @@
 ﻿using System;
-using LT.DigitalOffice.Models.Broker.Enums;
 
 namespace LT.DigitalOffice.WikiService.Business.Commands.File.Find
 {
