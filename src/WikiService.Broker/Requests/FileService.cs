@@ -27,7 +27,7 @@ namespace LT.DigitalOffice.WikiService.Broker.Requests
 
     public async Task<List<FileCharacteristicsData>> GetFilesCharacteristicsAsync(List<Guid> filesIds, List<string> errors = null)
     {
-/*      if (filesIds is null || !filesIds.Any())
+      if (filesIds is null || !filesIds.Any())
       {
         return null;
       }
@@ -37,9 +37,7 @@ namespace LT.DigitalOffice.WikiService.Broker.Requests
           IGetFilesRequest.CreateObj(filesIds),
           errors,
           _logger))
-        ?.FilesCharacteristicsData;*/
-
-      return null;
+        ?.FilesCharacteristicsData;
     }
   }
 }

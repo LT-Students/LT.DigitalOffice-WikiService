@@ -2,6 +2,7 @@
 using FluentValidation.Results;
 using LT.DigitalOffice.Kernel.Exceptions.Models;
 using LT.DigitalOffice.Kernel.Extensions;
+using LT.DigitalOffice.ProjectService.Broker.Publishes.Interfaces;
 using LT.DigitalOffice.WikiService.Business.Commands.Article.Edit.Interfaces;
 using LT.DigitalOffice.WikiService.Business.Commands.Wiki;
 using LT.DigitalOffice.WikiService.Data.Provider;
@@ -26,6 +27,7 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Article.Edit
     private readonly IEditArticleRequestValidator _validator;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IMemoryCache _cache;
+    private readonly IPublish _publish;
 
     private Task<ValueTuple<int, Guid>[]> GetPositionsAsync(Guid rubricId)
     {
@@ -144,6 +146,7 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Article.Edit
     {
       Guid rubricId = dbArticle.RubricId;
       int position = dbArticle.Position;
+      bool isActive = dbArticle.IsActive;
       request.ApplyTo(dbArticle);
 
       if (rubricId != dbArticle.RubricId)
@@ -162,6 +165,12 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Article.Edit
           rubricId: dbArticle.RubricId);
       }
 
+      if (isActive && !dbArticle.IsActive)
+      {
+        await _publish.RemoveFilesAsync(dbArticle.Files.Select(file => file.FileId).ToList());
+        dbArticle.Files.Clear();
+      }
+
       dbArticle.ModifiedBy = _httpContextAccessor.HttpContext.GetUserId();
       dbArticle.ModifiedAtUtc = DateTime.UtcNow;
       await _provider.SaveAsync();
@@ -173,12 +182,14 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.Article.Edit
        IEditArticleRequestValidator validator,
        IDataProvider provider,
        IHttpContextAccessor httpContextAccessor,
-       IMemoryCache cache)
+       IMemoryCache cache,
+       IPublish publish)
     {
       _validator = validator;
       _provider = provider;
       _httpContextAccessor = httpContextAccessor;
       _cache = cache;
+      _publish = publish;
     }
 
     public async Task<bool> Handle(EditSpecificArticleRequest request, CancellationToken ct)
