@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DigitalOffice.Models.Broker.Enums;
 using LT.DigitalOffice.Kernel.BrokerSupport.Helpers;
 using LT.DigitalOffice.Models.Broker.Models.File;
 using LT.DigitalOffice.Models.Broker.Requests.File;
@@ -34,7 +35,9 @@ namespace LT.DigitalOffice.WikiService.Broker.Requests
 
       return (await RequestHandler.ProcessRequest<IGetFilesRequest, IGetFilesResponse>(
           _rcGetFiles,
-          IGetFilesRequest.CreateObj(filesIds),
+          IGetFilesRequest.CreateObj(
+            FileSource.Wiki,
+            filesIds),
           errors,
           _logger))
         ?.FilesCharacteristicsData;
