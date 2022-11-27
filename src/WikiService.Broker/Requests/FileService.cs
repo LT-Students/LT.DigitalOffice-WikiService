@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DigitalOffice.Models.Broker.Enums;
 using LT.DigitalOffice.Kernel.BrokerSupport.Helpers;
 using LT.DigitalOffice.Models.Broker.Models.File;
 using LT.DigitalOffice.Models.Broker.Requests.File;
@@ -27,19 +28,19 @@ namespace LT.DigitalOffice.WikiService.Broker.Requests
 
     public async Task<List<FileCharacteristicsData>> GetFilesCharacteristicsAsync(List<Guid> filesIds, List<string> errors = null)
     {
-/*      if (filesIds is null || !filesIds.Any())
+      if (filesIds is null || !filesIds.Any())
       {
         return null;
       }
 
       return (await RequestHandler.ProcessRequest<IGetFilesRequest, IGetFilesResponse>(
           _rcGetFiles,
-          IGetFilesRequest.CreateObj(filesIds),
+          IGetFilesRequest.CreateObj(
+            FileSource.Wiki,
+            filesIds),
           errors,
           _logger))
-        ?.FilesCharacteristicsData;*/
-
-      return null;
+        ?.FilesCharacteristicsData;
     }
   }
 }

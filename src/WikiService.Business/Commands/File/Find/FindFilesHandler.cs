@@ -1,12 +1,10 @@
 ﻿using DigitalOffice.Kernel.Responses;
-using LT.DigitalOffice.Kernel.Responses;
-using LT.DigitalOffice.Models.Broker.Enums;
 using LT.DigitalOffice.Models.Broker.Models.File;
 using LT.DigitalOffice.WikiService.Broker.Requests.Interfaces;
-using LT.DigitalOffice.WikiService.Business.Commands.Wiki;
 using LT.DigitalOffice.WikiService.Data.Provider;
 using LT.DigitalOffice.WikiService.Models.Db;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -21,20 +19,18 @@ namespace LT.DigitalOffice.WikiService.Business.Commands.File.Find
 
     private async Task<(List<DbArticleFile>, int filesCount)> FindAsync(FileFindFilter filter)
     {
-      /*      if (filter is null)
-            {
-              return (null, 0);
-            }
+      if (filter is null)
+      {
+        return (null, 0);
+      }
 
-            IQueryable<DbProjectFile> dbFilesQuery = _provider.ProjectsFiles
-              .AsQueryable();
+      IQueryable<DbArticleFile> dbFilesQuery = _provider.ArticlesFiles
+        .AsQueryable();
 
-            return (
-              await dbFilesQuery.Where(file => file.ProjectId == filter.ProjectId && file.Access >= (int)access)
-                .Skip(filter.SkipCount).Take(filter.TakeCount).ToListAsync(),
-              await dbFilesQuery.CountAsync());*/
-
-      return (null, 0);
+      return (
+        await dbFilesQuery.Where(file => file.ArticleId == filter.ArticleId)
+          .Skip(filter.SkipCount).Take(filter.TakeCount).ToListAsync(),
+        await dbFilesQuery.CountAsync());
     }
 
     private FileInfo Map(FileCharacteristicsData file)
